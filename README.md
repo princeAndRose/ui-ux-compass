@@ -25,7 +25,7 @@ assets/
 
 The manifest exposes `./skills/`. The optional `hooks/` files are included as local resources, but the manifest intentionally does not declare a `hooks` field because the current local plugin validator rejects that field.
 
-Skill names remain English for Codex compatibility. The deterministic detector, trigger evaluations, and review vocabulary support English, Chinese, and mixed Chinese-English UI/UX requests.
+Skill names remain English for Codex compatibility. The deterministic detector, trigger evaluations, and review vocabulary support English, Chinese, and mixed Chinese-English UI/UX requests. The detector is an evidence tool for the router, not a replacement for model judgment or repository context.
 
 ## Suggested AGENTS.md Snippet
 

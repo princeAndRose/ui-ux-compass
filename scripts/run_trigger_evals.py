@@ -33,7 +33,26 @@ GATE_MODES = {
     "acceptance",
 }
 
-SUBJECTIVE_TERMS = {"ugly", "cramped", "template-like", "template like", "not premium", "not product-like"}
+SUBJECTIVE_TERMS = {
+    "不高级",
+    "不好看",
+    "不像真实产品",
+    "信息层级不清",
+    "太丑",
+    "太乱",
+    "太挤",
+    "太花",
+    "廉价",
+    "有点怪",
+    "模板感",
+    "feels weird",
+    "ugly",
+    "cramped",
+    "template-like",
+    "template like",
+    "not premium",
+    "not product-like",
+}
 
 
 def _bool(value: str) -> bool:

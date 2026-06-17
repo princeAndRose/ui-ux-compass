@@ -16,11 +16,22 @@ Do not ask UX questions for backend-only, infra-only, test-only, dependency-only
 ## Routing Steps
 
 1. Determine whether the task affects a user-facing interface.
-2. Inspect likely UI files, routes, components, styling, and design tokens before asking the user.
-3. Classify UI/UX risk from 0 to 4.
-4. Choose the minimum useful intervention.
-5. If implementation is safe, continue with explicit assumptions.
-6. If implementation is risky, route to the appropriate UI/UX Compass skill.
+2. If local shell access is available and the task is not obviously backend-only, infra-only, test-only, dependency-only, or documentation-only, run detector evidence:
+
+```bash
+python3 scripts/detect_ui_surface.py --repo-root . --message "<user request>" --json
+```
+
+Use `python` instead of `python3` when that is the local Python command. Treat the detector output as evidence, not the sole source of truth.
+
+3. Inspect likely UI files, routes, components, styling, and design tokens before asking the user.
+4. Combine model judgment, detector evidence, repo evidence, and prior conversation.
+5. Classify UI/UX risk from 0 to 4.
+6. Choose the minimum useful intervention.
+7. If implementation is safe, continue with explicit assumptions.
+8. If implementation is risky, route to the appropriate UI/UX Compass skill.
+
+Do not run the detector when the task is obviously non-UI, such as pure API tests, backend retries, database migrations, dependency updates, CI config, or internal refactors with no user-facing behavior change.
 
 ## Risk Levels
 
@@ -58,4 +69,4 @@ Risk 4: core product surface, high-fidelity prototype, landing page, onboarding 
 
 ## Useful References
 
-Read `references/routing-matrix.md` for risk details, `references/prompt-contracts.md` for output contracts, and `references/examples.md` for common routing examples.
+Read `references/router-execution.md` for evidence handling, `references/routing-matrix.md` for risk details, `references/prompt-contracts.md` for output contracts, and `references/examples.md` for common routing examples.

@@ -128,6 +128,36 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["risk_level"], 0)
                     self.assertEqual(result["recommended_mode"], "observe")
 
+    def test_script_assisted_router_examples_from_issue_3(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        cases = [
+            ("Refactor dashboard API tests", False, 0, "observe"),
+            ("Add dashboard filters to UI", True, 2, "ask-one-question"),
+            ("This page feels weird", True, 4, "review"),
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt, ui_related, risk, mode in cases:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertEqual(result["ui_related"], ui_related)
+                    self.assertEqual(result["risk_level"], risk)
+                    self.assertEqual(result["recommended_mode"], mode)
+
+    def test_router_docs_require_detector_evidence(self):
+        router = Path("skills/ui-ux-compass-router/SKILL.md").read_text(encoding="utf-8")
+        execution = Path("references/router-execution.md").read_text(encoding="utf-8")
+
+        self.assertIn("scripts/detect_ui_surface.py", router)
+        self.assertIn("detector evidence", router.lower())
+        self.assertIn("not the sole source of truth", router.lower())
+        self.assertIn("model judgment", execution.lower())
+        self.assertIn("deterministic detector result", execution.lower())
+        self.assertIn("final routing decision", execution.lower())
+
 
 class InspectDesignSystemTests(unittest.TestCase):
     def test_detects_next_tailwind_and_shadcn(self):

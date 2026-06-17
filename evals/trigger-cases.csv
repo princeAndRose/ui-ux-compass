@@ -49,3 +49,6 @@ T047,"新增表单流程",3,mini-brief,true
 T048,"做复杂仪表盘",4,full-brief,true
 T049,"修复按钮类型错误",1,apply-existing-conventions,false
 T050,"响应式布局有点怪",4,review,true
+T051,"Refactor dashboard API tests",0,observe,false
+T052,"Add dashboard filters to UI",2,ask-one-question,true
+T053,"This page feels weird",4,review,true

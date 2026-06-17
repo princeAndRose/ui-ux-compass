@@ -1,6 +1,6 @@
 # Routing Matrix
 
-Use this matrix after `ui-ux-compass-router` triggers. Choose the lowest risk level that handles the real ambiguity.
+Use this matrix after `ui-ux-compass-router` gathers model judgment, deterministic detector result, repo evidence, and prior conversation. Choose the lowest risk level that handles the real ambiguity.
 
 ## Risk 0: Non-UI
 
