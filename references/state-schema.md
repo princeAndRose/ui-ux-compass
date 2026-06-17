@@ -11,37 +11,49 @@ Do not create project state silently. If `.ui-ux-compass/` does not exist, ask b
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "project": {
-    "name": "",
-    "summary": "",
-    "product_type": "",
-    "target_users": [],
-    "primary_use_cases": [],
-    "anti_goals": []
+    "facts": {
+      "name": "",
+      "summary": "",
+      "product_type": "",
+      "target_users": [],
+      "primary_use_cases": [],
+      "anti_goals": []
+    },
+    "confirmed": {},
+    "assumptions": {}
   },
   "user_preferences": {
-    "density_default": "medium",
-    "visual_tone": ["restrained", "clear", "product-like"],
-    "layout_preferences": [],
-    "color_preferences": [],
-    "component_preferences": [],
-    "anti_patterns": [
-      "generic SaaS landing page",
-      "overused gradients",
-      "heavy shadows",
-      "meaningless illustrations",
-      "equal-weight cards everywhere"
-    ]
+    "defaults": {
+      "density_default": "medium",
+      "visual_tone": ["restrained", "clear", "product-like"],
+      "layout_preferences": [],
+      "color_preferences": [],
+      "component_preferences": [],
+      "anti_patterns": [
+        "generic SaaS landing page",
+        "overused gradients",
+        "heavy shadows",
+        "meaningless illustrations",
+        "equal-weight cards everywhere"
+      ]
+    },
+    "confirmed": {},
+    "assumptions": {}
   },
   "design_system": {
-    "framework": "",
-    "router": "",
-    "styling": "",
-    "ui_library": "",
-    "tokens": [],
-    "component_dirs": [],
-    "notes": []
+    "facts": {
+      "framework": "",
+      "router": "",
+      "styling": "",
+      "ui_library": "",
+      "tokens": [],
+      "component_dirs": [],
+      "notes": []
+    },
+    "confirmed": {},
+    "assumptions": {}
   },
   "pages": {
     "page-id": {
@@ -89,4 +101,10 @@ Do not create project state silently. If `.ui-ux-compass/` does not exist, ask b
 - `project-fact`: verified from project files or existing design system.
 - `agent-assumption`: inferred by the agent and not confirmed.
 
-Confirmed decisions must never be created from agent assumptions.
+## Merge Rules
+
+- `user-confirmed` writes user preferences, confirmed project/design-system decisions, and page decisions.
+- `project-fact` writes project and design-system facts verified from code or files.
+- `agent-assumption` writes only assumptions.
+- Agent assumptions must never overwrite confirmed preferences, project facts, design-system facts, or page decisions.
+- v1 state files are migrated on load: old project and design-system fields become facts; old user preferences become confirmed preferences.

@@ -8,6 +8,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+try:
+    from scripts.update_ui_state import migrate_state
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    from update_ui_state import migrate_state
+
 
 def _list(values: list[Any]) -> str:
     if not values:
@@ -23,28 +28,71 @@ def _list(values: list[Any]) -> str:
     return "\n".join(lines)
 
 
+def _dict_lines(values: dict[str, Any]) -> list[str]:
+    lines = []
+    for key, value in values.items():
+        if value in (None, "", [], {}):
+            continue
+        if isinstance(value, list):
+            rendered = ", ".join(str(item) for item in value) or "Unknown"
+        else:
+            rendered = str(value)
+        lines.append(f"- {key}: {rendered}")
+    return lines or ["- None"]
+
+
+def _merged_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(preferences.get("defaults", {}))
+    merged.update(preferences.get("confirmed", {}))
+    return merged
+
+
 def render_state(state: dict[str, Any]) -> str:
+    state = migrate_state(state)
     project = state.get("project", {})
+    project_facts = project.get("facts", {})
+    project_confirmed = project.get("confirmed", {})
+    project_assumptions = project.get("assumptions", {})
     preferences = state.get("user_preferences", {})
+    confirmed_preferences = preferences.get("confirmed", {})
+    assumed_preferences = preferences.get("assumptions", {})
+    preference_view = _merged_preferences(preferences)
     design_system = state.get("design_system", {})
+    design_facts = design_system.get("facts", {})
+    design_confirmed = design_system.get("confirmed", {})
+    design_assumptions = design_system.get("assumptions", {})
     pages = state.get("pages", {})
 
     lines = [
         "## UI Intent Summary",
         "",
-        "Project:",
-        f"- Name: {project.get('name', '') or 'Unknown'}",
-        f"- Summary: {project.get('summary', '') or 'Unknown'}",
-        f"- Product type: {project.get('product_type', '') or 'Unknown'}",
+        "Project facts:",
+        *_dict_lines(project_facts),
         "",
-        "User preferences:",
-        f"- Density default: {preferences.get('density_default', 'medium')}",
-        f"- Visual tone: {', '.join(preferences.get('visual_tone', [])) or 'Unknown'}",
+        "Confirmed project decisions:",
+        *_dict_lines(project_confirmed),
         "",
-        "Design system:",
-        f"- Framework: {design_system.get('framework', '') or 'Unknown'}",
-        f"- Router: {design_system.get('router', '') or 'Unknown'}",
-        f"- Styling: {design_system.get('styling', '') or 'Unknown'}",
+        "Project assumptions:",
+        *_dict_lines(project_assumptions),
+        "",
+        "Confirmed preferences:",
+        *_dict_lines(confirmed_preferences),
+        "",
+        "Preference defaults:",
+        f"- Density default: {preference_view.get('density_default', 'medium')}",
+        f"- Visual tone: {', '.join(preference_view.get('visual_tone', [])) or 'Unknown'}",
+        "",
+        "Preference assumptions:",
+        *_dict_lines(assumed_preferences),
+        "",
+        "Design system facts:",
+        *_dict_lines(design_facts),
+        "",
+        "Confirmed design system decisions:",
+        *_dict_lines(design_confirmed),
+        "",
+        "Design system assumptions:",
+        *_dict_lines(design_assumptions),
         "",
         "Pages:",
     ]
@@ -58,10 +106,12 @@ def render_state(state: dict[str, Any]) -> str:
             f"  - Role: {page.get('page_role', '') or page.get('role', '') or 'Unknown'}",
             f"  - Target user: {page.get('target_user', '') or 'Unknown'}",
             f"  - Core task: {page.get('core_task', '') or 'Unknown'}",
-            "  - Decisions:",
+            "  - Confirmed decisions:",
             "\n".join(f"    {line}" for line in _list(page.get("decisions", [])).splitlines()),
-            "  - Assumptions:",
+            "  - Agent assumptions:",
             "\n".join(f"    {line}" for line in _list(page.get("assumptions", [])).splitlines()),
+            "  - Open questions:",
+            "\n".join(f"    {line}" for line in _list(page.get("open_questions", [])).splitlines()),
         ])
 
     return "\n".join(lines).rstrip() + "\n"

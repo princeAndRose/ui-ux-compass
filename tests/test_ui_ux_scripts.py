@@ -302,31 +302,76 @@ class StateScriptTests(unittest.TestCase):
         merged = merge_patch(state, patch)
 
         page = merged["pages"]["dashboard"]
-        self.assertEqual(page["route"], "/dashboard")
+        self.assertEqual(page["route"], "")
         self.assertEqual(page["decisions"], [])
-        self.assertEqual(page["assumptions"], [{"source": "agent-assumption", "text": "Medium density"}])
+        self.assertIn({"source": "agent-assumption", "text": "route: /dashboard"}, page["assumptions"])
+        self.assertIn({"source": "agent-assumption", "text": "page_role: Status overview"}, page["assumptions"])
+        self.assertIn({"source": "agent-assumption", "text": "Medium density"}, page["assumptions"])
+
+    def test_agent_assumption_does_not_overwrite_confirmed_preference(self):
+        from scripts.update_ui_state import default_state, merge_patch
+
+        state = default_state("Example")
+        state = merge_patch(state, {
+            "source": "user-confirmed",
+            "user_preferences": {"density_default": "high"},
+        })
+        state = merge_patch(state, {
+            "source": "agent-assumption",
+            "user_preferences": {"density_default": "low", "visual_tone": ["playful"]},
+        })
+
+        self.assertEqual(state["user_preferences"]["confirmed"]["density_default"], "high")
+        self.assertEqual(state["user_preferences"]["assumptions"]["density_default"], "low")
+        self.assertEqual(state["user_preferences"]["assumptions"]["visual_tone"], ["playful"])
+
+    def test_project_fact_design_system_merge_uses_facts_bucket(self):
+        from scripts.update_ui_state import default_state, merge_patch
+
+        state = merge_patch(default_state("Example"), {
+            "source": "project-fact",
+            "design_system": {
+                "framework": "next",
+                "router": "app-router",
+                "component_dirs": ["src/components/ui"],
+            },
+        })
+
+        facts = state["design_system"]["facts"]
+        self.assertEqual(facts["framework"], "next")
+        self.assertEqual(facts["router"], "app-router")
+        self.assertEqual(facts["component_dirs"], ["src/components/ui"])
 
     def test_render_state_outputs_markdown_summary(self):
         from scripts.render_ui_state import render_state
-        from scripts.update_ui_state import default_state
+        from scripts.update_ui_state import default_state, merge_patch
 
-        state = default_state("Example")
-        state["project"]["summary"] = "A UI workflow plugin"
+        state = merge_patch(default_state("Example"), {
+            "source": "project-fact",
+            "project": {"summary": "A UI workflow plugin"},
+        })
         state["pages"]["dashboard"] = {
             "route": "/dashboard",
             "status": "draft",
             "page_role": "Status overview",
             "target_user": "Founder",
             "core_task": "Scan project health",
-            "decisions": [],
-            "assumptions": []
+            "decisions": [{"source": "user-confirmed", "text": "P0 status summary"}],
+            "assumptions": [{"source": "agent-assumption", "text": "Medium density"}],
+            "open_questions": ["Which metrics are P0?"],
         }
 
         markdown = render_state(state)
 
         self.assertIn("## UI Intent Summary", markdown)
+        self.assertIn("Project facts:", markdown)
+        self.assertIn("Confirmed preferences:", markdown)
+        self.assertIn("Agent assumptions:", markdown)
+        self.assertIn("Open questions:", markdown)
         self.assertIn("A UI workflow plugin", markdown)
         self.assertIn("/dashboard", markdown)
+        self.assertIn("P0 status summary", markdown)
+        self.assertIn("Medium density", markdown)
 
     def test_ui_intent_schema_validates_stores_and_renders_page_role(self):
         from scripts.render_ui_state import render_state
@@ -361,6 +406,26 @@ class StateScriptTests(unittest.TestCase):
         self.assertEqual(validation["status"], "pass")
         self.assertEqual(merged["pages"]["dashboard"]["page_role"], "Dashboard")
         self.assertIn("Role: Dashboard", markdown)
+
+    def test_v1_state_migrates_to_source_aware_v2(self):
+        from scripts.update_ui_state import load_state
+
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "state.json"
+            path.write_text(json.dumps({
+                "version": 1,
+                "project": {"name": "Legacy", "summary": "Old project"},
+                "user_preferences": {"density_default": "low"},
+                "design_system": {"framework": "react"},
+                "pages": {},
+            }), encoding="utf-8")
+
+            state = load_state(path, "Example")
+
+        self.assertEqual(state["version"], 2)
+        self.assertEqual(state["project"]["facts"]["summary"], "Old project")
+        self.assertEqual(state["user_preferences"]["confirmed"]["density_default"], "low")
+        self.assertEqual(state["design_system"]["facts"]["framework"], "react")
 
 
 class TriggerEvalTests(unittest.TestCase):

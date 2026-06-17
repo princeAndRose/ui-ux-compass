@@ -25,6 +25,13 @@ Do not create project state silently. If `.ui-ux-compass/` does not exist, ask b
 
 Never write an agent assumption as a confirmed decision.
 
+State schema v2 is source-aware:
+
+- Project and design-system context is split into `facts`, `confirmed`, and `assumptions`.
+- User preferences are split into `defaults`, `confirmed`, and `assumptions`.
+- `project-fact` patches may update facts; `user-confirmed` patches may update confirmed preferences/decisions; `agent-assumption` patches may update only assumptions.
+- Existing v1 state is migrated on load by `scripts/update_ui_state.py`.
+
 ## Supported Actions
 
 - Read current state.
