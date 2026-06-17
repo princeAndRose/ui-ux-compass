@@ -55,7 +55,7 @@ def render_state(state: dict[str, Any]) -> str:
         lines.extend([
             f"- {page_id}: {page.get('route', '') or 'No route'}",
             f"  - Status: {page.get('status', 'draft')}",
-            f"  - Role: {page.get('role', '') or 'Unknown'}",
+            f"  - Role: {page.get('page_role', '') or page.get('role', '') or 'Unknown'}",
             f"  - Target user: {page.get('target_user', '') or 'Unknown'}",
             f"  - Core task: {page.get('core_task', '') or 'Unknown'}",
             "  - Decisions:",

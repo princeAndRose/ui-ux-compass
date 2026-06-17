@@ -46,3 +46,5 @@ Before implementing a new user-facing page or substantial UI flow, produce a UI 
 python -m unittest discover -s tests -v
 python D:/codex-home/skills/.system/plugin-creator/scripts/validate_plugin.py .
 ```
+
+The external validation scripts import `yaml`. If your local Python does not include PyYAML, install it in a temporary path or use a Python environment that already provides it before running those validators.

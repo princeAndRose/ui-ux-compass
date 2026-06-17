@@ -43,7 +43,43 @@ Do not create project state silently. If `.ui-ux-compass/` does not exist, ask b
     "component_dirs": [],
     "notes": []
   },
-  "pages": {}
+  "pages": {
+    "page-id": {
+      "route": "",
+      "surface_type": "",
+      "status": "draft",
+      "page_role": "",
+      "target_user": "",
+      "core_task": "",
+      "first_visual_focus": "",
+      "information_hierarchy": {
+        "p0": [],
+        "p1": [],
+        "p2": [],
+        "deferred": []
+      },
+      "main_cta": "",
+      "user_flow": {
+        "entry": "",
+        "decision": "",
+        "action": "",
+        "feedback": "",
+        "error_path": ""
+      },
+      "layout_strategy": "",
+      "visual_direction": "",
+      "interaction_states": [],
+      "responsive_strategy": "",
+      "accessibility_notes": [],
+      "implementation_constraints": [],
+      "anti_goals": [],
+      "acceptance_criteria": [],
+      "open_questions": [],
+      "decisions": [],
+      "assumptions": [],
+      "last_review": null
+    }
+  }
 }
 ```
 

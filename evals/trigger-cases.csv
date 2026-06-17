@@ -14,3 +14,6 @@ T012,"Fix a TypeScript error in Button.tsx",1,apply-existing-conventions,false
 T013,"Create an editor layout with preview and controls",4,full-brief,true
 T014,"The layout feels too template-like",4,review,true
 T015,"Add a new admin management page",3,mini-brief,true
+T016,"Improve performance metrics aggregation",0,observe,false
+T017,"Refactor dashboard API tests",0,observe,false
+T018,"Update information schema docs",0,observe,false

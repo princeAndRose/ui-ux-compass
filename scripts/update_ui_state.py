@@ -20,7 +20,7 @@ def default_page() -> dict[str, Any]:
         "route": "",
         "surface_type": "",
         "status": "draft",
-        "role": "",
+        "page_role": "",
         "target_user": "",
         "core_task": "",
         "first_visual_focus": "",
@@ -117,6 +117,14 @@ def _append_sourced(items: list[Any], source: str, target: list[dict[str, str]])
                 target.append(entry)
 
 
+def _normalize_page_keys(page: dict[str, Any]) -> dict[str, Any]:
+    normalized = deepcopy(page)
+    if "role" in normalized and "page_role" not in normalized:
+        normalized["page_role"] = normalized["role"]
+    normalized.pop("role", None)
+    return normalized
+
+
 def merge_patch(state: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]:
     source = patch.get("source")
     if source not in SOURCE_TYPES:
@@ -134,7 +142,9 @@ def merge_patch(state: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]:
     for page_id, page_patch in pages.items():
         if not isinstance(page_patch, dict):
             raise ValueError(f"patch page {page_id} must be an object")
-        page = _deep_merge(default_page(), merged["pages"].get(page_id, {}))
+        page_patch = _normalize_page_keys(page_patch)
+        existing_page = _normalize_page_keys(merged["pages"].get(page_id, {}))
+        page = _deep_merge(default_page(), existing_page)
         decisions = list(page.get("decisions", []))
         assumptions = list(page.get("assumptions", []))
         for key, value in page_patch.items():

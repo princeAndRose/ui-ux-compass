@@ -9,8 +9,53 @@ from pathlib import Path
 from typing import Any
 
 
+SKIP_DIRS = {
+    ".git",
+    ".cache",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    ".turbo",
+    "build",
+    "coverage",
+    "dist",
+    "node_modules",
+    "out",
+}
+MAX_CSS_BYTES_PER_FILE = 20000
+MAX_CSS_BYTES_TOTAL = 200000
+
+
 def _rel(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
+
+
+def _is_skipped(root: Path, path: Path) -> bool:
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError:
+        return True
+    return any(part in SKIP_DIRS for part in parts)
+
+
+def _iter_files(root: Path, pattern: str):
+    for path in root.glob(pattern):
+        if path.is_file() and not _is_skipped(root, path):
+            yield path
+
+
+def _read_css_sample(paths) -> str:
+    chunks: list[str] = []
+    remaining = MAX_CSS_BYTES_TOTAL
+    for path in paths:
+        if remaining <= 0:
+            break
+        limit = min(MAX_CSS_BYTES_PER_FILE, remaining)
+        with path.open("r", encoding="utf-8", errors="ignore") as handle:
+            chunk = handle.read(limit)
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return "\n".join(chunks)
 
 
 def _load_package_json(root: Path) -> dict[str, Any]:
@@ -59,11 +104,11 @@ def inspect_design_system(repo_root: Path | str) -> dict[str, Any]:
         router = "file-routes"
 
     styling: list[str] = []
-    if "tailwindcss" in dep_names or any(root.glob("tailwind.config.*")):
+    if "tailwindcss" in dep_names or any(_iter_files(root, "tailwind.config.*")):
         styling.append("tailwind")
-    if any(root.glob("**/*.module.css")):
+    if any(_iter_files(root, "**/*.module.css")):
         styling.append("css-modules")
-    if "sass" in dep_names or any(root.glob("**/*.scss")):
+    if "sass" in dep_names or any(_iter_files(root, "**/*.scss")):
         styling.append("sass")
     if "styled-components" in dep_names:
         styling.append("styled-components")
@@ -91,7 +136,7 @@ def inspect_design_system(repo_root: Path | str) -> dict[str, Any]:
         "src/styles/globals.css",
         "app/globals.css",
     ]
-    tokens = sorted({_rel(root, path) for pattern in token_patterns for path in root.glob(pattern) if path.is_file()})
+    tokens = sorted({_rel(root, path) for pattern in token_patterns for path in _iter_files(root, pattern)})
 
     component_candidates = [
         root / "src" / "components" / "ui",
@@ -112,7 +157,7 @@ def inspect_design_system(repo_root: Path | str) -> dict[str, Any]:
     elif (root / "bun.lockb").is_file() or (root / "bun.lock").is_file():
         package_manager = "bun"
 
-    css_text = "\n".join(path.read_text(encoding="utf-8", errors="ignore")[:20000] for path in root.glob("**/*.css") if path.is_file())
+    css_text = _read_css_sample(_iter_files(root, "**/*.css"))
     conventions = {
         "package_manager": package_manager,
         "uses_css_variables": "var(--" in css_text or ":root" in css_text,

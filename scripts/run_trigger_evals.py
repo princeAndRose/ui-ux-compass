@@ -40,9 +40,23 @@ def _bool(value: str) -> bool:
     return value.strip().lower() == "true"
 
 
+def _mode_matches(expected_mode: str, predicted_mode: str) -> bool:
+    allowed = {part.strip() for part in expected_mode.split(" or ") if part.strip()}
+    return predicted_mode in allowed
+
+
+def _load_expectations(csv_path: Path) -> dict[str, Any]:
+    path = csv_path.parent / "expected-routing.json"
+    if not path.is_file():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload if isinstance(payload, dict) else {}
+
+
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
     path = Path(csv_path)
     root = Path(repo_root)
+    expectations = _load_expectations(path)
     rows: list[dict[str, Any]] = []
     with path.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
@@ -64,6 +78,7 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
                 "predicted_mode": predicted_mode,
                 "expected_should_ask": expected_should_ask,
                 "predicted_should_ask": predicted_should_ask,
+                "mode_matches": _mode_matches(expected_mode, predicted_mode),
                 "risk_within_one": abs(expected_risk - predicted_risk) <= 1,
                 "false_question": not expected_should_ask and predicted_should_ask,
                 "risk_3_or_4_without_gate": expected_risk >= 3 and predicted_mode not in GATE_MODES,
@@ -78,12 +93,14 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
     result = {
         "total": len(rows),
         "risk_within_one_rate": round(sum(1 for row in rows if row["risk_within_one"]) / total, 3),
+        "mode_accuracy": round(sum(1 for row in rows if row["mode_matches"]) / total, 3),
         "false_question_rate": round(false_question_count / non_ask_total, 3),
         "risk_3_or_4_without_gate": sum(1 for row in rows if row["risk_3_or_4_without_gate"]),
         "subjective_feedback_to_review_rate": round(
             sum(1 for row in rows if row["subjective"] and row["subjective_to_review"]) / subjective_total,
             3,
         ),
+        "expectations": expectations.get("success_metrics", {}),
         "cases": rows,
     }
     return result

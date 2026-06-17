@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -107,11 +108,47 @@ NON_UI_TERMS = {
     "backend",
     "server",
     "retry",
+    "performance",
+    "pipeline",
+    "platform",
+    "transform",
+}
+
+EXPLICIT_UI_TERMS = {
+    "page",
+    "screen",
+    "modal",
+    "form",
+    "layout",
+    "sidebar",
+    "header",
+    "button",
+    "css",
+    "style",
+    "tailwind",
+    "component",
+    "responsive",
+    "empty state",
+    "selected state",
+    "dark mode",
+    "settings page",
+    "landing page",
+    "pricing page",
+    "new page",
+    "new flow",
+    "form flow",
+    "editor layout",
 }
 
 
+def _matches_term(message: str, term: str) -> bool:
+    escaped = re.escape(term).replace(r"\ ", r"\s+")
+    pattern = rf"(?<![a-z0-9_-]){escaped}(?![a-z0-9_-])"
+    return re.search(pattern, message, flags=re.IGNORECASE) is not None
+
+
 def _contains_any(message: str, terms: set[str]) -> list[str]:
-    return sorted(term for term in terms if term in message)
+    return sorted(term for term in terms if _matches_term(message, term))
 
 
 def _repo_signals(repo_root: Path) -> tuple[list[str], list[str]]:
@@ -145,11 +182,17 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
 
     repo_signals, surfaces = _repo_signals(root)
     likely_surfaces.extend(surfaces)
+    non_ui_terms = _contains_any(normalized, NON_UI_TERMS)
+    explicit_ui_terms = _contains_any(normalized, EXPLICIT_UI_TERMS)
 
     review_terms = _contains_any(normalized, SUBJECTIVE_REVIEW_TERMS)
     if review_terms:
         signals.extend(f"subjective UI feedback: {term}" for term in review_terms)
         return _result(True, 4, signals, likely_surfaces, "review", "ui-ux-review", repo_signals)
+
+    if non_ui_terms and not explicit_ui_terms:
+        signals.extend(f"non-UI term: {term}" for term in non_ui_terms)
+        return _result(False, 0, signals, likely_surfaces, "observe", "ui-ux-compass-router", repo_signals)
 
     risk_4_terms = _contains_any(normalized, RISK_4_TERMS)
     if risk_4_terms:
@@ -173,8 +216,7 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
         return _result(True, 1, signals, likely_surfaces, "apply-existing-conventions", "ui-ux-compass-router", repo_signals)
 
     ui_terms = _contains_any(normalized, GENERAL_UI_TERMS)
-    non_ui_terms = _contains_any(normalized, NON_UI_TERMS)
-    if ui_terms and not (non_ui_terms and len(ui_terms) == 0):
+    if ui_terms:
         signals.extend(f"general UI term: {term}" for term in ui_terms)
         risk = 2 if len(ui_terms) <= 2 else 3
         mode = "ask-one-question" if risk == 2 else "mini-brief"
