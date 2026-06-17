@@ -151,6 +151,7 @@ class DetectUiSurfaceTests(unittest.TestCase):
         from scripts.detect_ui_surface import detect_ui_surface
 
         cases = [
+            "Add a dashboard with filters",
             "Add a dashboard page with filters",
             "Add a settings page with a form",
         ]
@@ -410,6 +411,16 @@ class StateScriptTests(unittest.TestCase):
                 "source": "agent-assumption",
                 "project": {"facts": {"summary": "Assumed summary"}},
             })
+        with self.assertRaises(ValueError):
+            merge_patch(state, {
+                "source": "agent-assumption",
+                "project": {"facts": {}},
+            })
+        with self.assertRaises(ValueError):
+            merge_patch(state, {
+                "source": "project-fact",
+                "project": {"facts": []},
+            })
 
     def test_render_state_outputs_markdown_summary(self):
         from scripts.render_ui_state import render_state
@@ -568,17 +579,36 @@ class WorkflowEvalTests(unittest.TestCase):
                 "id": "missing-expectations",
                 "message": "Create a dashboard",
             }), encoding="utf-8")
+            no_spec = Path(temp) / "no-spec"
+            no_spec.mkdir()
+            (no_spec / "case.json").write_text(json.dumps({
+                "id": "missing-spec",
+                "message": "Create a dashboard",
+                "expected_validation": {"status": "blocked"},
+            }), encoding="utf-8")
+            no_message = Path(temp) / "no-message"
+            no_message.mkdir()
+            (no_message / "case.json").write_text(json.dumps({
+                "id": "missing-message",
+                "expected_route": {"ui_related": False},
+            }), encoding="utf-8")
 
             empty_result = run_workflow_evals(empty, Path("."))
             missing_result = run_workflow_evals(missing, Path("."))
             no_expectations_result = run_workflow_evals(no_expectations, Path("."))
+            no_spec_result = run_workflow_evals(no_spec, Path("."))
+            no_message_result = run_workflow_evals(no_message, Path("."))
 
         self.assertFalse(empty_result["passed"])
         self.assertFalse(missing_result["passed"])
         self.assertFalse(no_expectations_result["passed"])
+        self.assertFalse(no_spec_result["passed"])
+        self.assertFalse(no_message_result["passed"])
         self.assertIn("_fixtures", empty_result["failures"])
         self.assertIn("_fixtures", missing_result["failures"])
         self.assertIn("missing-expectations", no_expectations_result["failures"])
+        self.assertIn("missing-spec", no_spec_result["failures"])
+        self.assertIn("missing-message", no_message_result["failures"])
 
 
 class ReferenceKnowledgePackTests(unittest.TestCase):

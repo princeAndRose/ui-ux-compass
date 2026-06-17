@@ -50,6 +50,8 @@ def _evaluate_fixture(path: Path, repo_root: Path) -> dict[str, Any]:
         failures.append("fixture must include expected_route or expected_validation")
 
     if expected_route:
+        if not str(fixture.get("message", "")).strip():
+            failures.append("fixture with expected_route must include message")
         detected = detect_ui_surface(repo_root, str(fixture.get("message", "")))
         result["route"] = detected
         for key, expected in expected_route.items():
@@ -84,6 +86,8 @@ def _evaluate_fixture(path: Path, repo_root: Path) -> dict[str, Any]:
                 "validation.weak",
                 failures,
             )
+    elif expected_validation:
+        failures.append("fixture with expected_validation must include spec")
 
     result["passed"] = not failures
     result["failures"] = failures

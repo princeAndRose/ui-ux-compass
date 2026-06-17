@@ -305,6 +305,14 @@ LOCAL_EXISTING_TERMS = {
     "现有",
 }
 
+LOCAL_FEATURE_OF_SURFACE_TERMS = {
+    "dashboard filter",
+    "dashboard filters",
+    "dashboard 加",
+    "给 dashboard",
+    "仪表盘筛选器",
+}
+
 NEW_SURFACE_TERMS = {
     "build",
     "create",
@@ -328,17 +336,29 @@ NEW_SURFACE_TERMS = {
 }
 
 SURFACE_CREATION_TERMS = NEW_SURFACE_TERMS | {
+    "admin page",
+    "dashboard",
     "editor",
     "editor layout",
     "landing page",
+    "management page",
     "onboarding",
     "pricing page",
+    "report page",
+    "settings page",
+    "screen",
     "定价页",
     "引导页",
     "新手引导",
     "核心界面",
     "编辑器",
     "落地页",
+    "仪表盘",
+    "后台页面",
+    "报告页",
+    "管理后台",
+    "管理页",
+    "设置页",
     "页面",
 }
 
@@ -415,9 +435,10 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
     risk_2_terms = _contains_any(normalized, RISK_2_TERMS)
     local_change_terms = _contains_any(normalized, LOCAL_CHANGE_TERMS)
     local_existing_terms = _contains_any(normalized, LOCAL_EXISTING_TERMS)
+    local_feature_terms = _contains_any(normalized, LOCAL_FEATURE_OF_SURFACE_TERMS)
     new_surface_terms = _contains_any(normalized, NEW_SURFACE_TERMS)
     surface_creation_terms = _contains_any(normalized, SURFACE_CREATION_TERMS)
-    if risk_2_terms and local_change_terms and (local_existing_terms or not surface_creation_terms):
+    if risk_2_terms and local_change_terms and (local_existing_terms or local_feature_terms or not surface_creation_terms):
         signals.extend(f"local UI ambiguity term: {term}" for term in risk_2_terms)
         signals.extend(f"local change cue: {term}" for term in local_change_terms)
         mode = "assumptions-gate" if any(term in ASSUMPTIONS_GATE_TERMS for term in risk_2_terms) else "ask-one-question"

@@ -209,12 +209,12 @@ def _merge_source_aware_section(section: dict[str, Any], patch_section: dict[str
         if bucket not in patch_section:
             continue
         value = patch_section.get(bucket)
-        if not value:
-            continue
         if bucket not in allowed_buckets:
             raise ValueError(f"{source} patch cannot write {section_name}.{bucket}")
         if not isinstance(value, dict):
             raise ValueError(f"patch.{section_name}.{bucket} must be an object")
+        if not value:
+            continue
         merged[bucket] = _deep_merge(merged.get(bucket, {}), value)
 
     if section_name == "project":
