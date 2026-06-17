@@ -44,7 +44,7 @@ Before implementing a new user-facing page or substantial UI flow, produce a UI 
 
 ```bash
 python -m unittest discover -s tests -v
-python D:/codex-home/skills/.system/plugin-creator/scripts/validate_plugin.py .
+python scripts/run_trigger_evals.py --cases evals/trigger-cases.csv --repo-root .
 ```
 
-The external validation scripts import `yaml`. If your local Python does not include PyYAML, install it in a temporary path or use a Python environment that already provides it before running those validators.
+If you have the Codex plugin validation tools installed, also run the official plugin validator from your local Codex tooling against the repository root. Those validators may require PyYAML in the Python environment that runs them.
