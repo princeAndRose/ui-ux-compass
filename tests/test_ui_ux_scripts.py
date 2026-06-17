@@ -134,6 +134,8 @@ class DetectUiSurfaceTests(unittest.TestCase):
         cases = [
             ("Refactor dashboard API tests", False, 0, "observe"),
             ("Add dashboard filters to UI", True, 2, "ask-one-question"),
+            ("Add filters to dashboard", True, 2, "ask-one-question"),
+            ("给仪表盘加筛选器", True, 2, "ask-one-question"),
             ("This page feels weird", True, 4, "review"),
         ]
 
