@@ -60,4 +60,4 @@ P2:
 ## Acceptance checklist
 ```
 
-Use `references/review-checklist.md`, `references/anti-patterns.md`, and `references/visual-vocabulary.md`.
+Use `references/review-checklist.md`, `references/anti-patterns.md`, `references/visual-vocabulary.md`, `references/design-quality-rubric.md`, `references/feedback-translation-table.md`, `references/state-patterns.md`, and `references/before-after-review-examples.md`.

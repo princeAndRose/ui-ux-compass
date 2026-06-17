@@ -42,3 +42,5 @@ Implementation instructions:
 ```
 
 If status is `blocked`, do not write high-fidelity UI. If the user explicitly asks to continue, switch to `pass-with-assumptions` and list the assumptions plainly.
+
+Use `references/design-quality-rubric.md`, `references/state-patterns.md`, and `references/component-patterns.md` to check whether the spec is implementation-ready.

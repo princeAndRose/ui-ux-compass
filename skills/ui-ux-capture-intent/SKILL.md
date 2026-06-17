@@ -42,4 +42,4 @@ Unknown:
 Recommended next question:
 ```
 
-Use `scripts/inspect_design_system.py`, `scripts/extract_routes.py`, and `scripts/render_ui_state.py` when local project context is useful.
+Use `references/surface-playbooks.md`, `references/layout-archetypes.md`, and `references/state-patterns.md` to classify the surface and likely missing decisions. Use `scripts/inspect_design_system.py`, `scripts/extract_routes.py`, and `scripts/render_ui_state.py` when local project context is useful.

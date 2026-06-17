@@ -33,4 +33,4 @@ Do not focus on color, gradients, decoration, or fine styling. Focus on regions,
 +----------------------+--------------------+
 ```
 
-Use `references/layout-patterns.md` and `references/ui-intent-spec-template.md`.
+Use `references/layout-patterns.md`, `references/layout-archetypes.md`, `references/state-patterns.md`, and `references/ui-intent-spec-template.md`.

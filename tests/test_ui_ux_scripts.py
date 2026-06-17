@@ -380,5 +380,52 @@ class TriggerEvalTests(unittest.TestCase):
         self.assertIn("risk_within_one_rate", result["failures"])
 
 
+class ReferenceKnowledgePackTests(unittest.TestCase):
+    def test_expanded_reference_pack_is_discoverable(self):
+        required = [
+            "surface-playbooks.md",
+            "layout-archetypes.md",
+            "component-patterns.md",
+            "state-patterns.md",
+            "design-quality-rubric.md",
+            "feedback-translation-table.md",
+            "before-after-review-examples.md",
+        ]
+        references = Path("references")
+
+        for filename in required:
+            with self.subTest(filename=filename):
+                self.assertTrue((references / filename).is_file())
+
+        knowledge = "\n".join((references / filename).read_text(encoding="utf-8").lower() for filename in required)
+        for term in [
+            "dashboard",
+            "workspace",
+            "editor",
+            "settings",
+            "admin",
+            "list-detail",
+            "form or wizard",
+            "onboarding",
+            "landing",
+            "pricing",
+            "empty/loading/error",
+            "data table",
+            "modal",
+            "drawer",
+            "command palette",
+            "p0 / p1 / p2",
+            "implementation constraints",
+            "不好看",
+        ]:
+            with self.subTest(term=term):
+                self.assertIn(term, knowledge)
+
+        skill_docs = "\n".join(path.read_text(encoding="utf-8") for path in Path("skills").glob("*/SKILL.md"))
+        for filename in required:
+            with self.subTest(skill_reference=filename):
+                self.assertIn(f"references/{filename}", skill_docs)
+
+
 if __name__ == "__main__":
     unittest.main()

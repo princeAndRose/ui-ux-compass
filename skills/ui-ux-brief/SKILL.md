@@ -35,6 +35,6 @@ Ask one question at a time. Every question must explain why it matters, provide 
 
 ## Output
 
-Use `references/ui-intent-spec-template.md` and `references/prompt-contracts.md`.
+Use `references/ui-intent-spec-template.md`, `references/prompt-contracts.md`, `references/surface-playbooks.md`, `references/state-patterns.md`, and `references/feedback-translation-table.md`.
 
 Never ask vague aesthetic questions. Translate subjective preference into product-relevant axes such as density, hierarchy, structure, tone, state coverage, and interaction priority.

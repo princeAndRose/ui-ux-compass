@@ -27,3 +27,5 @@ Recommended next action:
 ```
 
 Do not accept a UI that lacks required states, contradicts the primary user task, hides P0 content, or violates stated constraints.
+
+Use `references/design-quality-rubric.md`, `references/state-patterns.md`, and `references/component-patterns.md` before accepting or requesting revisions.

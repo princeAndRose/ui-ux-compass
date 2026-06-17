@@ -46,4 +46,4 @@ Risk:
 I recommend Direction <A/B/C> because...
 ```
 
-Use `references/visual-vocabulary.md` and `references/layout-patterns.md` for consistent language.
+Use `references/visual-vocabulary.md`, `references/layout-patterns.md`, `references/layout-archetypes.md`, `references/component-patterns.md`, and `references/design-quality-rubric.md` for consistent language.
