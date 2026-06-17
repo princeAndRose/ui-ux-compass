@@ -190,6 +190,33 @@ def _normalize_page_keys(page: dict[str, Any]) -> dict[str, Any]:
 
 def _merge_source_aware_section(section: dict[str, Any], patch_section: dict[str, Any], source: str, section_name: str) -> dict[str, Any]:
     merged = deepcopy(section)
+    if section_name in {"project", "design_system"}:
+        allowed_buckets = {
+            "project-fact": {"facts"},
+            "user-confirmed": {"confirmed"},
+            "agent-assumption": {"assumptions"},
+        }[source]
+    elif section_name == "user_preferences":
+        allowed_buckets = {
+            "user-confirmed": {"confirmed"},
+            "project-fact": {"assumptions"},
+            "agent-assumption": {"assumptions"},
+        }[source]
+    else:
+        allowed_buckets = {"assumptions"}
+
+    for bucket in SOURCE_SECTION_KEYS:
+        if bucket not in patch_section:
+            continue
+        value = patch_section.get(bucket)
+        if not value:
+            continue
+        if bucket not in allowed_buckets:
+            raise ValueError(f"{source} patch cannot write {section_name}.{bucket}")
+        if not isinstance(value, dict):
+            raise ValueError(f"patch.{section_name}.{bucket} must be an object")
+        merged[bucket] = _deep_merge(merged.get(bucket, {}), value)
+
     if section_name == "project":
         if source == "project-fact":
             bucket = "facts"
@@ -209,7 +236,8 @@ def _merge_source_aware_section(section: dict[str, Any], patch_section: dict[str
     else:
         bucket = "assumptions"
     values = {key: value for key, value in patch_section.items() if key not in SOURCE_SECTION_KEYS}
-    merged[bucket] = _deep_merge(merged.get(bucket, {}), values)
+    if values:
+        merged[bucket] = _deep_merge(merged.get(bucket, {}), values)
     return merged
 
 

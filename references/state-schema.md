@@ -108,3 +108,32 @@ Do not create project state silently. If `.ui-ux-compass/` does not exist, ask b
 - `agent-assumption` writes only assumptions.
 - Agent assumptions must never overwrite confirmed preferences, project facts, design-system facts, or page decisions.
 - v1 state files are migrated on load: old project and design-system fields become facts; old user preferences become confirmed preferences.
+
+## Merge Patch Examples
+
+Flat patches are routed by `source`:
+
+```json
+{
+  "source": "project-fact",
+  "design_system": {
+    "framework": "next",
+    "router": "app-router"
+  }
+}
+```
+
+Bucketed v2 patches are also supported when the bucket matches `source`:
+
+```json
+{
+  "source": "project-fact",
+  "project": {
+    "facts": {
+      "summary": "Verified from README"
+    }
+  }
+}
+```
+
+Invalid bucket writes fail instead of being ignored. For example, `agent-assumption` cannot write `project.facts`.

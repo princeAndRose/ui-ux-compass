@@ -45,13 +45,16 @@ def _evaluate_fixture(path: Path, repo_root: Path) -> dict[str, Any]:
     }
 
     expected_route = fixture.get("expected_route")
+    expected_validation = fixture.get("expected_validation")
+    if not expected_route and not expected_validation:
+        failures.append("fixture must include expected_route or expected_validation")
+
     if expected_route:
         detected = detect_ui_surface(repo_root, str(fixture.get("message", "")))
         result["route"] = detected
         for key, expected in expected_route.items():
             _check_equal(detected.get(key), expected, f"route.{key}", failures)
 
-    expected_validation = fixture.get("expected_validation")
     if "spec" in fixture:
         validation = validate_ui_intent(fixture["spec"])
         result["validation"] = validation
@@ -90,7 +93,24 @@ def _evaluate_fixture(path: Path, repo_root: Path) -> dict[str, Any]:
 def run_workflow_evals(fixtures_dir: Path | str, repo_root: Path | str) -> dict[str, Any]:
     root = Path(repo_root)
     directory = Path(fixtures_dir)
-    cases = [_evaluate_fixture(path, root) for path in sorted(directory.glob("*.json"))]
+    if not directory.is_dir():
+        return {
+            "total": 0,
+            "passed_count": 0,
+            "passed": False,
+            "failures": {"_fixtures": [f"fixtures directory does not exist: {directory}"]},
+            "cases": [],
+        }
+    fixture_paths = sorted(directory.glob("*.json"))
+    if not fixture_paths:
+        return {
+            "total": 0,
+            "passed_count": 0,
+            "passed": False,
+            "failures": {"_fixtures": [f"no workflow fixtures found in {directory}"]},
+            "cases": [],
+        }
+    cases = [_evaluate_fixture(path, root) for path in fixture_paths]
     failures = {case["id"]: case["failures"] for case in cases if not case["passed"]}
     return {
         "total": len(cases),

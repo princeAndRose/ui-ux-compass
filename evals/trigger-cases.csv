@@ -52,3 +52,5 @@ T050,"响应式布局有点怪",4,review,true
 T051,"Refactor dashboard API tests",0,observe,false
 T052,"Add dashboard filters to UI",2,ask-one-question,true
 T053,"This page feels weird",4,review,true
+T054,"Add a dashboard page with filters",3,mini-brief,true
+T055,"Add a settings page with a form",3,mini-brief,true

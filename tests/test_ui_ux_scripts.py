@@ -147,6 +147,24 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["risk_level"], risk)
                     self.assertEqual(result["recommended_mode"], mode)
 
+    def test_new_page_requests_with_local_features_stay_risk_3(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        cases = [
+            "Add a dashboard page with filters",
+            "Add a settings page with a form",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in cases:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertTrue(result["ui_related"])
+                    self.assertEqual(result["risk_level"], 3)
+                    self.assertEqual(result["recommended_mode"], "mini-brief")
+
     def test_router_docs_require_detector_evidence(self):
         router = Path("skills/ui-ux-compass-router/SKILL.md").read_text(encoding="utf-8")
         execution = Path("references/router-execution.md").read_text(encoding="utf-8")
@@ -282,6 +300,39 @@ class ValidateUiIntentTests(unittest.TestCase):
         self.assertIn("layout_strategy is too generic to guide implementation.", result["weak"])
         self.assertTrue(result["recommended_questions"])
 
+    def test_empty_main_cta_requires_explicit_no_action_justification(self):
+        from scripts.validate_ui_intent import validate_ui_intent
+
+        base = {
+            "page_role": "Analytics dashboard",
+            "target_user": "Founder",
+            "core_task": "Monitor revenue health",
+            "first_visual_focus": "Revenue trend",
+            "information_hierarchy": {"p0": ["revenue"], "p1": ["segments"], "p2": []},
+            "main_cta": "",
+            "user_flow": {"entry": "Open dashboard", "action": "Scan trend", "feedback": "Data refresh time is visible"},
+            "layout_strategy": "Summary plus drilldown",
+            "visual_direction": {"density": "medium-high", "tone": "focused", "structure": "summary plus drilldown"},
+            "interaction_states": ["loading", "empty", "error"],
+            "implementation_constraints": ["Use existing chart components"],
+            "acceptance_criteria": [
+                "Revenue trend is visually dominant in the first viewport",
+                "Loading, empty, and error states preserve the chart layout",
+            ],
+        }
+
+        without_justification = validate_ui_intent(base)
+        with_justification = validate_ui_intent({
+            **base,
+            "main_cta_justification": "Read-only monitoring surface with no primary action.",
+        })
+
+        self.assertEqual(without_justification["status"], "blocked")
+        self.assertIn("main_cta", without_justification["missing"])
+        self.assertIn("main_cta is required before implementation.", without_justification["blocking_reasons"])
+        self.assertEqual(with_justification["status"], "pass")
+        self.assertNotIn("main_cta", with_justification["missing"])
+
 
 class StateScriptTests(unittest.TestCase):
     def test_merge_patch_preserves_assumptions_separately(self):
@@ -341,6 +392,24 @@ class StateScriptTests(unittest.TestCase):
         self.assertEqual(facts["framework"], "next")
         self.assertEqual(facts["router"], "app-router")
         self.assertEqual(facts["component_dirs"], ["src/components/ui"])
+
+    def test_bucketed_v2_state_patch_is_source_checked(self):
+        from scripts.update_ui_state import default_state, merge_patch
+
+        state = merge_patch(default_state("Example"), {
+            "source": "project-fact",
+            "project": {"facts": {"summary": "Verified from README"}},
+            "design_system": {"facts": {"framework": "next"}},
+        })
+
+        self.assertEqual(state["project"]["facts"]["summary"], "Verified from README")
+        self.assertEqual(state["design_system"]["facts"]["framework"], "next")
+
+        with self.assertRaises(ValueError):
+            merge_patch(state, {
+                "source": "agent-assumption",
+                "project": {"facts": {"summary": "Assumed summary"}},
+            })
 
     def test_render_state_outputs_markdown_summary(self):
         from scripts.render_ui_state import render_state
@@ -483,8 +552,33 @@ class WorkflowEvalTests(unittest.TestCase):
         result = run_workflow_evals(Path("evals/workflows"), Path("."))
 
         self.assertTrue(result["passed"])
-        self.assertEqual(result["total"], 5)
-        self.assertEqual(result["passed_count"], 5)
+        self.assertEqual(result["total"], 6)
+        self.assertEqual(result["passed_count"], 6)
+
+    def test_workflow_eval_fails_for_missing_or_empty_fixtures(self):
+        from scripts.run_workflow_evals import run_workflow_evals
+
+        with tempfile.TemporaryDirectory() as temp:
+            empty = Path(temp) / "empty"
+            empty.mkdir()
+            missing = Path(temp) / "missing"
+            no_expectations = Path(temp) / "no-expectations"
+            no_expectations.mkdir()
+            (no_expectations / "case.json").write_text(json.dumps({
+                "id": "missing-expectations",
+                "message": "Create a dashboard",
+            }), encoding="utf-8")
+
+            empty_result = run_workflow_evals(empty, Path("."))
+            missing_result = run_workflow_evals(missing, Path("."))
+            no_expectations_result = run_workflow_evals(no_expectations, Path("."))
+
+        self.assertFalse(empty_result["passed"])
+        self.assertFalse(missing_result["passed"])
+        self.assertFalse(no_expectations_result["passed"])
+        self.assertIn("_fixtures", empty_result["failures"])
+        self.assertIn("_fixtures", missing_result["failures"])
+        self.assertIn("missing-expectations", no_expectations_result["failures"])
 
 
 class ReferenceKnowledgePackTests(unittest.TestCase):

@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from scripts.detect_ui_surface import detect_ui_surface
+    from scripts.detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
-    from detect_ui_surface import detect_ui_surface
+    from detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
 
 
 QUESTION_MODES = {
@@ -31,27 +31,6 @@ GATE_MODES = {
     "full-brief",
     "review",
     "acceptance",
-}
-
-SUBJECTIVE_TERMS = {
-    "不高级",
-    "不好看",
-    "不像真实产品",
-    "信息层级不清",
-    "太丑",
-    "太乱",
-    "太挤",
-    "太花",
-    "廉价",
-    "有点怪",
-    "模板感",
-    "feels weird",
-    "ugly",
-    "cramped",
-    "template-like",
-    "template like",
-    "not premium",
-    "not product-like",
 }
 
 
@@ -104,6 +83,11 @@ def _evaluate_thresholds(metrics: dict[str, Any], thresholds: dict[str, Any]) ->
     return failures
 
 
+def _is_subjective_prompt(prompt: str) -> bool:
+    normalized = prompt.lower()
+    return any(_matches_term(normalized, term) for term in SUBJECTIVE_REVIEW_TERMS)
+
+
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
     path = Path(csv_path)
     root = Path(repo_root)
@@ -118,8 +102,7 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
             predicted_risk = int(detected["risk_level"])
             predicted_mode = str(detected["recommended_mode"])
             predicted_should_ask = predicted_mode in QUESTION_MODES
-            prompt = row["prompt"].lower()
-            subjective = any(term in prompt for term in SUBJECTIVE_TERMS)
+            subjective = _is_subjective_prompt(row["prompt"])
             rows.append({
                 "id": row["id"],
                 "prompt": row["prompt"],

@@ -127,7 +127,13 @@ def _dict_has_present(value: Any, key: str) -> bool:
 
 def _main_cta_can_be_empty(spec: dict[str, Any]) -> bool:
     context = " ".join(str(spec.get(field, "")) for field in ["page_role", "core_task", "layout_strategy"]).lower()
-    return any(term in context for term in ["read-only", "read only", "readonly", "report", "analytics", "monitor"])
+    context_allows_no_action = any(term in context for term in ["read-only", "read only", "readonly", "report", "analytics", "monitor"])
+    justification = str(spec.get("main_cta_justification", "") or spec.get("primary_action_justification", "")).lower()
+    explicit_no_action = any(
+        term in justification
+        for term in ["read-only", "read only", "readonly", "no primary", "no cta", "no action", "not applicable"]
+    )
+    return context_allows_no_action and (spec.get("no_primary_action") is True or explicit_no_action)
 
 
 def _missing_required_fields(spec: dict[str, Any]) -> list[str]:

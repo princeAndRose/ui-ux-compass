@@ -1,0 +1,47 @@
+{
+  "id": "analytics-empty-cta",
+  "description": "Analytics/report surfaces cannot omit a main CTA unless no-primary-action is explicit.",
+  "message": "Create an analytics dashboard",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 3,
+    "recommended_mode": "mini-brief"
+  },
+  "spec": {
+    "page_role": "Analytics dashboard",
+    "target_user": "Founder",
+    "core_task": "Monitor revenue health",
+    "first_visual_focus": "Revenue trend",
+    "information_hierarchy": {
+      "p0": ["revenue trend"],
+      "p1": ["segments"],
+      "p2": []
+    },
+    "main_cta": "",
+    "user_flow": {
+      "entry": "Open dashboard",
+      "action": "Scan revenue trend",
+      "feedback": "Refresh timestamp is visible"
+    },
+    "layout_strategy": "Summary plus drilldown",
+    "visual_direction": {
+      "density": "medium-high",
+      "tone": "focused",
+      "structure": "summary plus drilldown"
+    },
+    "interaction_states": ["loading", "empty", "error"],
+    "implementation_constraints": ["Use existing chart components"],
+    "acceptance_criteria": [
+      "Revenue trend is visually dominant in the first viewport",
+      "Loading, empty, and error states preserve the chart layout"
+    ]
+  },
+  "expected_validation": {
+    "status": "blocked",
+    "blocking": true,
+    "recommended_next": "ui-ux-brief",
+    "blocking_reasons_contains": [
+      "main_cta is required before implementation."
+    ]
+  }
+}
