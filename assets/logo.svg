@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" role="img" aria-label="UI/UX Compass logo">
+  <rect width="320" height="96" rx="18" fill="#111827"/>
+  <g transform="translate(24 16)">
+    <path d="M32 0l20 64-20-9-20 9L32 0z" fill="#A5B4FC"/>
+    <path d="M32 13l8 32-8-5-8 5 8-32z" fill="#F8FAFC"/>
+    <circle cx="32" cy="34" r="4" fill="#4F46E5"/>
+  </g>
+  <text x="96" y="42" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">UI/UX Compass</text>
+  <text x="96" y="66" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="13">Risk-based UI workflow routing for Codex</text>
+</svg>

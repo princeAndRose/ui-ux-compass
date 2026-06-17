@@ -1,0 +1,16 @@
+id,prompt,expected_risk,expected_mode,should_ask
+T001,"Fix the failing unit test in utils/date.ts",0,observe,false
+T002,"Change the Save button label to Publish",1,apply-existing-conventions,false
+T003,"Add an empty state to the existing tasks table",2,ask-one-question,true
+T004,"Create a dashboard page for this project",3,mini-brief,true
+T005,"Build a landing page for my app",4,full-brief,true
+T006,"This generated UI looks ugly and too cramped",4,review,true
+T007,"Add a new settings page",3,mini-brief,true
+T008,"Refactor the API client",0,observe,false
+T009,"Make the card component support selected state",2,assumptions-gate,true
+T010,"Implement onboarding for first-time users",4,full-brief,true
+T011,"Add dark mode support using existing tokens",2,assumptions-gate,true
+T012,"Fix a TypeScript error in Button.tsx",1,apply-existing-conventions,false
+T013,"Create an editor layout with preview and controls",4,full-brief,true
+T014,"The layout feels too template-like",4,review,true
+T015,"Add a new admin management page",3,mini-brief,true

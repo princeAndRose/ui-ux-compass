@@ -1,0 +1,15 @@
+{
+  "success_metrics": {
+    "risk_level_within_one": 0.9,
+    "false_question_rate_max": 0.15,
+    "risk_3_or_4_without_spec_or_assumptions_gate": 0,
+    "subjective_feedback_to_review": 1.0
+  },
+  "risk_modes": {
+    "0": "observe",
+    "1": "apply-existing-conventions",
+    "2": "ask-one-question or assumptions-gate",
+    "3": "mini-brief",
+    "4": "full-brief or review"
+  }
+}
