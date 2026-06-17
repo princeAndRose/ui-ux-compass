@@ -246,12 +246,47 @@ class TriggerEvalTests(unittest.TestCase):
         from scripts.run_trigger_evals import run_trigger_evals
 
         result = run_trigger_evals(Path("evals/trigger-cases.csv"), Path("."))
+        thresholds = result["expectations"]
 
-        self.assertGreaterEqual(result["risk_within_one_rate"], 0.9)
-        self.assertGreaterEqual(result["mode_accuracy"], 0.9)
-        self.assertLessEqual(result["false_question_rate"], 0.15)
-        self.assertEqual(result["risk_3_or_4_without_gate"], 0)
-        self.assertEqual(result["subjective_feedback_to_review_rate"], 1.0)
+        self.assertTrue(result["passed"])
+        self.assertGreaterEqual(result["risk_within_one_rate"], thresholds["risk_level_within_one"])
+        self.assertGreaterEqual(result["mode_accuracy"], thresholds["mode_accuracy"])
+        self.assertLessEqual(result["false_question_rate"], thresholds["false_question_rate_max"])
+        self.assertEqual(
+            result["risk_3_or_4_without_gate"],
+            thresholds["risk_3_or_4_without_spec_or_assumptions_gate"],
+        )
+        self.assertGreaterEqual(
+            result["subjective_feedback_to_review_rate"],
+            thresholds["subjective_feedback_to_review"],
+        )
+
+    def test_trigger_eval_uses_expected_routing_thresholds(self):
+        from scripts.run_trigger_evals import run_trigger_evals
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cases = root / "trigger-cases.csv"
+            expected = root / "expected-routing.json"
+            cases.write_text(
+                "id,prompt,expected_risk,expected_mode,should_ask\n"
+                'T001,"Fix the failing unit test in utils/date.ts",0,observe,false\n',
+                encoding="utf-8",
+            )
+            expected.write_text(json.dumps({
+                "success_metrics": {
+                    "risk_level_within_one": 1.1,
+                    "mode_accuracy": 1.0,
+                    "false_question_rate_max": 0.0,
+                    "risk_3_or_4_without_spec_or_assumptions_gate": 0,
+                    "subjective_feedback_to_review": 1.0,
+                }
+            }), encoding="utf-8")
+
+            result = run_trigger_evals(cases, root)
+
+        self.assertFalse(result["passed"])
+        self.assertIn("risk_within_one_rate", result["failures"])
 
 
 if __name__ == "__main__":

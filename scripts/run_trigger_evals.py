@@ -53,6 +53,38 @@ def _load_expectations(csv_path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _evaluate_thresholds(metrics: dict[str, Any], thresholds: dict[str, Any]) -> dict[str, str]:
+    failures: dict[str, str] = {}
+    if not thresholds:
+        return failures
+
+    minimum_checks = {
+        "risk_within_one_rate": "risk_level_within_one",
+        "mode_accuracy": "mode_accuracy",
+        "subjective_feedback_to_review_rate": "subjective_feedback_to_review",
+    }
+    for metric_name, threshold_name in minimum_checks.items():
+        if threshold_name not in thresholds:
+            continue
+        actual = float(metrics[metric_name])
+        expected = float(thresholds[threshold_name])
+        if actual < expected:
+            failures[metric_name] = f"{actual} < {expected}"
+
+    maximum_checks = {
+        "false_question_rate": "false_question_rate_max",
+        "risk_3_or_4_without_gate": "risk_3_or_4_without_spec_or_assumptions_gate",
+    }
+    for metric_name, threshold_name in maximum_checks.items():
+        if threshold_name not in thresholds:
+            continue
+        actual = float(metrics[metric_name])
+        expected = float(thresholds[threshold_name])
+        if actual > expected:
+            failures[metric_name] = f"{actual} > {expected}"
+    return failures
+
+
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
     path = Path(csv_path)
     root = Path(repo_root)
@@ -90,7 +122,7 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
     non_ask_total = sum(1 for row in rows if not row["expected_should_ask"]) or 1
     subjective_total = sum(1 for row in rows if row["subjective"]) or 1
     false_question_count = sum(1 for row in rows if row["false_question"])
-    result = {
+    metrics = {
         "total": len(rows),
         "risk_within_one_rate": round(sum(1 for row in rows if row["risk_within_one"]) / total, 3),
         "mode_accuracy": round(sum(1 for row in rows if row["mode_matches"]) / total, 3),
@@ -100,7 +132,14 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
             sum(1 for row in rows if row["subjective"] and row["subjective_to_review"]) / subjective_total,
             3,
         ),
-        "expectations": expectations.get("success_metrics", {}),
+    }
+    thresholds = expectations.get("success_metrics", {})
+    failures = _evaluate_thresholds(metrics, thresholds)
+    result = {
+        **metrics,
+        "expectations": thresholds,
+        "passed": not failures,
+        "failures": failures,
         "cases": rows,
     }
     return result
@@ -113,7 +152,7 @@ def main() -> int:
     args = parser.parse_args()
     result = run_trigger_evals(Path(args.cases), Path(args.repo_root))
     print(json.dumps(result, indent=2, ensure_ascii=False))
-    return 0
+    return 0 if result["passed"] else 1
 
 
 if __name__ == "__main__":
