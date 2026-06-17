@@ -153,6 +153,7 @@ class DetectUiSurfaceTests(unittest.TestCase):
         from scripts.detect_ui_surface import detect_ui_surface
 
         cases = [
+            "Add dashboard with filters",
             "Add a dashboard with filters",
             "Add a dashboard page with filters",
             "Add a settings page with a form",

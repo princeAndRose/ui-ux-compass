@@ -317,10 +317,6 @@ LOCAL_FEATURE_OF_SURFACE_TERMS = {
     "仪表盘筛选器",
 }
 
-DASHBOARD_SURFACE_TERMS = {"dashboard", "仪表盘"}
-FILTER_TERMS = {"filter", "filters", "筛选器"}
-NEW_SURFACE_ARTICLE_TERMS = {"a dashboard", "new dashboard", "新的仪表盘", "新仪表盘"}
-
 NEW_SURFACE_TERMS = {
     "build",
     "create",
@@ -397,20 +393,6 @@ def _contains_any(message: str, terms: set[str]) -> list[str]:
     return sorted(term for term in terms if _matches_term(message, term))
 
 
-def _is_local_surface_feature_change(
-    message: str,
-    local_change_terms: list[str],
-    risk_2_terms: list[str],
-    surface_creation_terms: list[str],
-) -> bool:
-    has_dashboard = bool(_contains_any(message, DASHBOARD_SURFACE_TERMS))
-    has_filter = bool(set(risk_2_terms) & FILTER_TERMS)
-    has_new_surface_article = bool(_contains_any(message, NEW_SURFACE_ARTICLE_TERMS))
-    return has_dashboard and has_filter and bool(local_change_terms) and not has_new_surface_article and (
-        "dashboard" in surface_creation_terms or "仪表盘" in surface_creation_terms
-    )
-
-
 def _repo_signals(repo_root: Path) -> tuple[list[str], list[str]]:
     signals: list[str] = []
     surfaces: list[str] = []
@@ -460,13 +442,7 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
     local_feature_terms = _contains_any(normalized, LOCAL_FEATURE_OF_SURFACE_TERMS)
     new_surface_terms = _contains_any(normalized, NEW_SURFACE_TERMS)
     surface_creation_terms = _contains_any(normalized, SURFACE_CREATION_TERMS)
-    local_surface_feature = _is_local_surface_feature_change(
-        normalized,
-        local_change_terms,
-        risk_2_terms,
-        surface_creation_terms,
-    )
-    if risk_2_terms and local_change_terms and (local_existing_terms or local_feature_terms or local_surface_feature or not surface_creation_terms):
+    if risk_2_terms and local_change_terms and (local_existing_terms or local_feature_terms or not surface_creation_terms):
         signals.extend(f"local UI ambiguity term: {term}" for term in risk_2_terms)
         signals.extend(f"local change cue: {term}" for term in local_change_terms)
         mode = "assumptions-gate" if any(term in ASSUMPTIONS_GATE_TERMS for term in risk_2_terms) else "ask-one-question"
