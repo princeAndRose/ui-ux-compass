@@ -11,6 +11,25 @@ from typing import Any
 
 
 SUBJECTIVE_REVIEW_TERMS = {
+    "不高级",
+    "不好看",
+    "不像产品",
+    "不像真实产品",
+    "信息层级不清",
+    "太丑",
+    "太乱",
+    "太挤",
+    "太散",
+    "太空",
+    "太紧凑",
+    "太花",
+    "套模板",
+    "廉价",
+    "有点怪",
+    "模板感",
+    "没重点",
+    "看起来怪",
+    "视觉层级不清",
     "ugly",
     "cramped",
     "generic",
@@ -21,11 +40,21 @@ SUBJECTIVE_REVIEW_TERMS = {
     "too empty",
     "not premium",
     "not product-like",
+    "像 demo",
     "hard to use",
     "looks wrong",
 }
 
 RISK_4_TERMS = {
+    "复杂仪表盘",
+    "定价页",
+    "引导页",
+    "新手引导",
+    "核心界面",
+    "编辑器",
+    "落地页",
+    "高保真",
+    "原型",
     "landing page",
     "pricing page",
     "onboarding",
@@ -38,6 +67,16 @@ RISK_4_TERMS = {
 }
 
 RISK_3_TERMS = {
+    "仪表盘",
+    "后台页面",
+    "报告页",
+    "新流程",
+    "新页面",
+    "管理后台",
+    "管理页",
+    "表单流程",
+    "设置页",
+    "页面",
     "dashboard",
     "settings page",
     "admin page",
@@ -50,6 +89,23 @@ RISK_3_TERMS = {
 }
 
 RISK_2_TERMS = {
+    "加载态",
+    "卡片组件",
+    "响应式",
+    "布局间距",
+    "弹窗",
+    "抽屉",
+    "暗色模式",
+    "深色模式",
+    "禁用态",
+    "空状态",
+    "筛选器",
+    "组件",
+    "表单",
+    "表格",
+    "选中态",
+    "错误态",
+    "间距",
     "empty state",
     "selected state",
     "dark mode",
@@ -64,6 +120,12 @@ RISK_2_TERMS = {
 }
 
 RISK_1_TERMS = {
+    "css 错误",
+    "修一个 css",
+    "图标对齐",
+    "按钮文案",
+    "按钮类型错误",
+    "文案",
     "button label",
     "label",
     "icon alignment",
@@ -73,6 +135,35 @@ RISK_1_TERMS = {
 }
 
 GENERAL_UI_TERMS = {
+    "ui",
+    "ux",
+    "仪表盘",
+    "后台页面",
+    "按钮",
+    "抽屉",
+    "新手引导",
+    "暗色模式",
+    "深色模式",
+    "核心界面",
+    "响应式",
+    "弹窗",
+    "布局",
+    "引导页",
+    "定价页",
+    "报告页",
+    "落地页",
+    "筛选器",
+    "管理后台",
+    "管理页",
+    "空状态",
+    "加载态",
+    "组件",
+    "表单",
+    "表格",
+    "设置页",
+    "选中态",
+    "错误态",
+    "页面",
     "ui",
     "ux",
     "page",
@@ -98,6 +189,19 @@ GENERAL_UI_TERMS = {
 }
 
 NON_UI_TERMS = {
+    "api 接口",
+    "单元测试",
+    "后端",
+    "性能聚合",
+    "接口",
+    "数据库",
+    "数据转换",
+    "数据表",
+    "服务端",
+    "测试",
+    "管道",
+    "重构 api",
+    "重试",
     "api",
     "database",
     "schema",
@@ -115,6 +219,36 @@ NON_UI_TERMS = {
 }
 
 EXPLICIT_UI_TERMS = {
+    "css",
+    "仪表盘",
+    "后台页面",
+    "按钮",
+    "抽屉",
+    "新手引导",
+    "暗色模式",
+    "深色模式",
+    "核心界面",
+    "响应式",
+    "弹窗",
+    "布局",
+    "引导页",
+    "定价页",
+    "报告页",
+    "新流程",
+    "新页面",
+    "管理后台",
+    "管理页",
+    "空状态",
+    "筛选器",
+    "组件",
+    "落地页",
+    "表单",
+    "表单流程",
+    "表格",
+    "设置页",
+    "选中态",
+    "错误态",
+    "页面",
     "page",
     "screen",
     "modal",
@@ -140,9 +274,63 @@ EXPLICIT_UI_TERMS = {
     "editor layout",
 }
 
+LOCAL_CHANGE_TERMS = {
+    "add",
+    "adjust",
+    "change",
+    "existing",
+    "support",
+    "update",
+    "修改",
+    "修复",
+    "加",
+    "增加",
+    "已有",
+    "支持",
+    "添加",
+    "现有",
+    "调整",
+    "当前",
+    "给",
+}
+
+NEW_SURFACE_TERMS = {
+    "build",
+    "create",
+    "new",
+    "prototype",
+    "创建",
+    "做一个",
+    "做一个新的",
+    "原型",
+    "新增",
+    "新建",
+    "新的",
+    "新流程",
+    "新页面",
+    "设计一个",
+    "高保真",
+}
+
+ASSUMPTIONS_GATE_TERMS = {
+    "dark mode",
+    "selected state",
+    "暗色模式",
+    "深色模式",
+    "禁用态",
+    "选中态",
+}
+
+
+def _contains_cjk(value: str) -> bool:
+    return re.search(r"[\u4e00-\u9fff]", value) is not None
+
 
 def _matches_term(message: str, term: str) -> bool:
-    escaped = re.escape(term).replace(r"\ ", r"\s+")
+    normalized_term = term.lower()
+    if _contains_cjk(normalized_term):
+        return normalized_term in message
+    escaped = re.escape(normalized_term).replace(r"\ ", r"\s+")
     pattern = rf"(?<![a-z0-9_-]){escaped}(?![a-z0-9_-])"
     return re.search(pattern, message, flags=re.IGNORECASE) is not None
 
@@ -194,6 +382,15 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
         signals.extend(f"non-UI term: {term}" for term in non_ui_terms)
         return _result(False, 0, signals, likely_surfaces, "observe", "ui-ux-compass-router", repo_signals)
 
+    risk_2_terms = _contains_any(normalized, RISK_2_TERMS)
+    local_change_terms = _contains_any(normalized, LOCAL_CHANGE_TERMS)
+    new_surface_terms = _contains_any(normalized, NEW_SURFACE_TERMS)
+    if risk_2_terms and local_change_terms and not new_surface_terms:
+        signals.extend(f"local UI ambiguity term: {term}" for term in risk_2_terms)
+        signals.extend(f"local change cue: {term}" for term in local_change_terms)
+        mode = "assumptions-gate" if any(term in ASSUMPTIONS_GATE_TERMS for term in risk_2_terms) else "ask-one-question"
+        return _result(True, 2, signals, likely_surfaces, mode, "ui-ux-capture-intent", repo_signals)
+
     risk_4_terms = _contains_any(normalized, RISK_4_TERMS)
     if risk_4_terms:
         signals.extend(f"high-risk UI term: {term}" for term in risk_4_terms)
@@ -204,10 +401,9 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
         signals.extend(f"new UI surface term: {term}" for term in risk_3_terms)
         return _result(True, 3, signals, likely_surfaces, "mini-brief", "ui-ux-brief", repo_signals)
 
-    risk_2_terms = _contains_any(normalized, RISK_2_TERMS)
     if risk_2_terms:
         signals.extend(f"local UI ambiguity term: {term}" for term in risk_2_terms)
-        mode = "assumptions-gate" if "dark mode" in risk_2_terms or "selected state" in risk_2_terms else "ask-one-question"
+        mode = "assumptions-gate" if any(term in ASSUMPTIONS_GATE_TERMS for term in risk_2_terms) else "ask-one-question"
         return _result(True, 2, signals, likely_surfaces, mode, "ui-ux-capture-intent", repo_signals)
 
     risk_1_terms = _contains_any(normalized, RISK_1_TERMS)

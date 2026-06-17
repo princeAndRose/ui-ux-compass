@@ -67,6 +67,67 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["risk_level"], 0)
                     self.assertEqual(result["recommended_mode"], "observe")
 
+    def test_chinese_subjective_feedback_routes_to_review(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        prompts = [
+            "这个页面不好看，太挤了",
+            "这个 UI 模板感太强，不像真实产品",
+            "看起来有点怪，信息层级不清",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in prompts:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertTrue(result["ui_related"])
+                    self.assertEqual(result["risk_level"], 4)
+                    self.assertEqual(result["recommended_mode"], "review")
+                    self.assertEqual(result["recommended_skill"], "ui-ux-review")
+
+    def test_chinese_ui_requests_route_by_risk(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        cases = [
+            ("做一个新的仪表盘页面", 3, "mini-brief"),
+            ("新增管理后台页面", 3, "mini-brief"),
+            ("给现有仪表盘加筛选器", 2, "ask-one-question"),
+            ("支持暗色模式和加载态", 2, "assumptions-gate"),
+            ("把按钮文案改成发布", 1, "apply-existing-conventions"),
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt, risk, mode in cases:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertTrue(result["ui_related"])
+                    self.assertEqual(result["risk_level"], risk)
+                    self.assertEqual(result["recommended_mode"], mode)
+
+    def test_chinese_non_ui_prompts_do_not_intervene(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        prompts = [
+            "重构 API 接口测试",
+            "优化数据库查询性能",
+            "修复服务端重试逻辑",
+            "更新数据转换管道",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in prompts:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertFalse(result["ui_related"])
+                    self.assertEqual(result["risk_level"], 0)
+                    self.assertEqual(result["recommended_mode"], "observe")
+
 
 class InspectDesignSystemTests(unittest.TestCase):
     def test_detects_next_tailwind_and_shadcn(self):
