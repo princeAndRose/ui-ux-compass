@@ -1,6 +1,6 @@
 # UI/UX Compass Evals
 
-The trigger cases check whether UI/UX Compass routes without over-interrupting.
+The trigger cases check whether UI/UX Compass routes without over-interrupting. The workflow fixtures combine trigger routing with UI Intent Spec validation for common end-to-end situations.
 
 Metrics:
 
@@ -15,4 +15,6 @@ Run the script tests with:
 
 ```bash
 python -m unittest discover -s tests -v
+python scripts/run_trigger_evals.py --cases evals/trigger-cases.csv --repo-root .
+python scripts/run_workflow_evals.py --fixtures evals/workflows --repo-root .
 ```

@@ -1,0 +1,39 @@
+{
+  "id": "ambiguous-dashboard",
+  "description": "A dashboard request with placeholder spec details should remain blocked.",
+  "message": "Create a dashboard page for this project",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 3,
+    "recommended_mode": "mini-brief"
+  },
+  "spec": {
+    "page_role": "Dashboard",
+    "target_user": "Founder",
+    "core_task": "TBD",
+    "first_visual_focus": "Metrics",
+    "information_hierarchy": {
+      "p0": [],
+      "p1": ["activity"],
+      "p2": []
+    },
+    "main_cta": "",
+    "user_flow": {},
+    "layout_strategy": "modern",
+    "visual_direction": "clean",
+    "interaction_states": [],
+    "implementation_constraints": ["Use existing components"],
+    "acceptance_criteria": []
+  },
+  "expected_validation": {
+    "status": "blocked",
+    "blocking": true,
+    "recommended_next": "ui-ux-brief",
+    "weak_min": 5,
+    "recommended_questions_min": 3,
+    "blocking_reasons_contains": [
+      "information_hierarchy.p0 must be non-empty.",
+      "core_task is required before implementation."
+    ]
+  }
+}

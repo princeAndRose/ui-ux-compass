@@ -1,0 +1,47 @@
+{
+  "id": "fast-mode-assumptions-gate",
+  "description": "Fast mode may proceed with explicit assumptions, but weak state and criteria gaps must stay visible.",
+  "message": "Move fast and create a compact dashboard with reasonable assumptions",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 3,
+    "recommended_mode": "mini-brief"
+  },
+  "spec": {
+    "page_role": "Dashboard",
+    "target_user": "Founder",
+    "core_task": "Scan project health",
+    "first_visual_focus": "Status summary",
+    "information_hierarchy": {
+      "p0": ["health"],
+      "p1": ["activity"],
+      "p2": []
+    },
+    "main_cta": "Review blockers",
+    "user_flow": {
+      "entry": "Open dashboard",
+      "action": "Review blockers",
+      "feedback": "Blocker list updates"
+    },
+    "layout_strategy": "Summary over detailed tables",
+    "visual_direction": {
+      "density": "medium-high",
+      "tone": "focused",
+      "structure": "summary plus drilldown"
+    },
+    "interaction_states": ["loading"],
+    "implementation_constraints": ["Use existing components"],
+    "acceptance_criteria": ["P0 status is visible"],
+    "assumptions": ["Use current design system defaults"]
+  },
+  "expected_validation": {
+    "status": "pass-with-assumptions",
+    "blocking": false,
+    "recommended_next": "implementation-gate",
+    "weak_min": 2,
+    "weak_contains": [
+      "interaction_states.empty is missing or lacks a not-applicable justification.",
+      "interaction_states.error is missing or lacks a not-applicable justification."
+    ]
+  }
+}

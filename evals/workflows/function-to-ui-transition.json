@@ -1,0 +1,44 @@
+{
+  "id": "function-to-ui-transition",
+  "description": "A backend/export capability becoming a visible report action should be treated as local UI ambiguity.",
+  "message": "Add export button to the existing report page",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 2,
+    "recommended_mode": "ask-one-question"
+  },
+  "spec": {
+    "page_role": "Read-only report page",
+    "target_user": "Operations lead",
+    "core_task": "Export the currently visible report data",
+    "first_visual_focus": "Report title, active filters, and export action",
+    "information_hierarchy": {
+      "p0": ["report data", "active filters", "export action"],
+      "p1": ["last updated time", "row count"],
+      "p2": ["download format help"]
+    },
+    "main_cta": "Export CSV",
+    "user_flow": {
+      "entry": "User opens an existing report",
+      "action": "Clicks Export CSV",
+      "feedback": "Button shows loading, then download starts or an inline error appears"
+    },
+    "layout_strategy": "Report toolbar action aligned with active filters",
+    "visual_direction": {
+      "density": "medium-high",
+      "tone": "utilitarian",
+      "structure": "toolbar above report table"
+    },
+    "interaction_states": ["loading", "empty", "error"],
+    "implementation_constraints": ["Use the existing button component", "Do not change report table columns"],
+    "acceptance_criteria": [
+      "Export action is visually associated with the active report filters",
+      "Loading and error feedback appear without shifting the report table"
+    ]
+  },
+  "expected_validation": {
+    "status": "pass",
+    "blocking": false,
+    "recommended_next": "implementation"
+  }
+}

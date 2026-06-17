@@ -1,0 +1,50 @@
+{
+  "id": "chinese-settings-page",
+  "description": "A Chinese settings-page request can route and validate with a complete spec.",
+  "message": "帮我做设置页",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 3,
+    "recommended_mode": "mini-brief"
+  },
+  "spec": {
+    "page_role": "Settings page for team preferences",
+    "target_user": "团队管理员",
+    "core_task": "Review and save workspace defaults",
+    "first_visual_focus": "Current workspace defaults and save status",
+    "information_hierarchy": {
+      "p0": ["current defaults", "save changes"],
+      "p1": ["explanations", "section grouping"],
+      "p2": ["audit metadata"]
+    },
+    "main_cta": "Save settings",
+    "user_flow": {
+      "entry": "Admin opens Settings from the sidebar",
+      "action": "Adjusts defaults and saves",
+      "feedback": "Inline success or validation feedback appears in the edited section"
+    },
+    "layout_strategy": "Grouped focused form with dangerous actions separated",
+    "visual_direction": {
+      "density": "medium",
+      "tone": "calm operational",
+      "structure": "sectioned settings form"
+    },
+    "interaction_states": {
+      "loading": "Skeleton preserves section heights",
+      "empty": "No custom defaults message with restore action",
+      "error": "Inline validation and save failure recovery",
+      "disabled": "Disabled controls explain permission requirements",
+      "success": "Saved status appears near the primary action"
+    },
+    "implementation_constraints": ["Use existing form controls", "Keep destructive actions separate"],
+    "acceptance_criteria": [
+      "Primary save action is visible after editing a setting",
+      "Loading, empty, and error states preserve the settings layout"
+    ]
+  },
+  "expected_validation": {
+    "status": "pass",
+    "blocking": false,
+    "recommended_next": "implementation"
+  }
+}

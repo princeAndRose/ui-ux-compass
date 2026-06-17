@@ -1,0 +1,11 @@
+{
+  "id": "subjective-ui-review",
+  "description": "Subjective Chinese UI feedback should route to review.",
+  "message": "这个页面不好看，太挤了",
+  "expected_route": {
+    "ui_related": true,
+    "risk_level": 4,
+    "recommended_mode": "review",
+    "recommended_skill": "ui-ux-review"
+  }
+}

@@ -243,16 +243,44 @@ class ValidateUiIntentTests(unittest.TestCase):
             "first_visual_focus": "Status summary",
             "information_hierarchy": {"p0": ["health"], "p1": ["activity"], "p2": []},
             "main_cta": "Review blockers",
-            "user_flow": {"entry": "Open dashboard", "action": "Review blockers"},
+            "user_flow": {"entry": "Open dashboard", "action": "Review blockers", "feedback": "Blocker list updates"},
             "layout_strategy": "Summary over detailed tables",
-            "visual_direction": "Focused tooling",
+            "visual_direction": {"density": "medium-high", "tone": "focused", "structure": "summary plus drilldown"},
             "interaction_states": ["loading", "empty", "error"],
             "implementation_constraints": ["Use existing components"],
-            "acceptance_criteria": ["P0 status is visually dominant"]
+            "acceptance_criteria": [
+                "P0 status is visually dominant above the activity feed",
+                "Loading, empty, and error states preserve the dashboard layout",
+            ]
         })
 
         self.assertEqual(result["status"], "pass")
         self.assertFalse(result["blocking"])
+        self.assertEqual(result["weak"], [])
+
+    def test_flags_weak_but_present_spec(self):
+        from scripts.validate_ui_intent import validate_ui_intent
+
+        result = validate_ui_intent({
+            "page_role": "Dashboard",
+            "target_user": "Founder",
+            "core_task": "Scan project health",
+            "first_visual_focus": "Status summary",
+            "information_hierarchy": {"p0": [], "p1": ["activity"], "p2": []},
+            "main_cta": "Review",
+            "user_flow": {"entry": "Open dashboard", "action": "Review"},
+            "layout_strategy": "modern",
+            "visual_direction": "clean",
+            "interaction_states": ["loading"],
+            "implementation_constraints": ["Use existing components"],
+            "acceptance_criteria": ["Looks good"]
+        })
+
+        self.assertEqual(result["status"], "blocked")
+        self.assertTrue(result["blocking"])
+        self.assertIn("information_hierarchy.p0 must be non-empty.", result["blocking_reasons"])
+        self.assertIn("layout_strategy is too generic to guide implementation.", result["weak"])
+        self.assertTrue(result["recommended_questions"])
 
 
 class StateScriptTests(unittest.TestCase):
@@ -312,12 +340,15 @@ class StateScriptTests(unittest.TestCase):
             "first_visual_focus": "Status summary",
             "information_hierarchy": {"p0": ["health"], "p1": ["activity"], "p2": []},
             "main_cta": "Review blockers",
-            "user_flow": {"entry": "Open dashboard", "action": "Review blockers"},
+            "user_flow": {"entry": "Open dashboard", "action": "Review blockers", "feedback": "Blocker list updates"},
             "layout_strategy": "Summary over detailed tables",
-            "visual_direction": "Focused tooling",
+            "visual_direction": {"density": "medium-high", "tone": "focused", "structure": "summary plus drilldown"},
             "interaction_states": ["loading", "empty", "error"],
             "implementation_constraints": ["Use existing components"],
-            "acceptance_criteria": ["P0 status is visually dominant"],
+            "acceptance_criteria": [
+                "P0 status is visually dominant above the activity feed",
+                "Loading, empty, and error states preserve the dashboard layout",
+            ],
         }
 
         validation = validate_ui_intent(intent)
@@ -378,6 +409,17 @@ class TriggerEvalTests(unittest.TestCase):
 
         self.assertFalse(result["passed"])
         self.assertIn("risk_within_one_rate", result["failures"])
+
+
+class WorkflowEvalTests(unittest.TestCase):
+    def test_workflow_eval_fixtures_pass(self):
+        from scripts.run_workflow_evals import run_workflow_evals
+
+        result = run_workflow_evals(Path("evals/workflows"), Path("."))
+
+        self.assertTrue(result["passed"])
+        self.assertEqual(result["total"], 5)
+        self.assertEqual(result["passed_count"], 5)
 
 
 class ReferenceKnowledgePackTests(unittest.TestCase):

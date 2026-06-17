@@ -47,6 +47,7 @@ Before implementing a new user-facing page or substantial UI flow, produce a UI 
 ```bash
 python -m unittest discover -s tests -v
 python scripts/run_trigger_evals.py --cases evals/trigger-cases.csv --repo-root .
+python scripts/run_workflow_evals.py --fixtures evals/workflows --repo-root .
 ```
 
 If you have the Codex plugin validation tools installed, also run the official plugin validator from your local Codex tooling against the repository root. Those validators may require PyYAML in the Python environment that runs them.

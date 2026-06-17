@@ -110,6 +110,7 @@ RISK_2_TERMS = {
     "empty state",
     "selected state",
     "dark mode",
+    "export button",
     "filter",
     "filters",
     "table",
