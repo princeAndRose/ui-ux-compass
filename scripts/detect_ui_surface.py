@@ -223,6 +223,8 @@ NON_UI_TERMS = {
 
 EXPLICIT_UI_TERMS = {
     "css",
+    "ui",
+    "ux",
     "仪表盘",
     "后台页面",
     "按钮",
@@ -251,6 +253,8 @@ EXPLICIT_UI_TERMS = {
     "设置页",
     "选中态",
     "错误态",
+    "视觉层级",
+    "信息层级",
     "页面",
     "page",
     "screen",
@@ -427,14 +431,17 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
     non_ui_terms = _contains_any(normalized, NON_UI_TERMS)
     explicit_ui_terms = _contains_any(normalized, EXPLICIT_UI_TERMS)
 
-    review_terms = _contains_any(normalized, SUBJECTIVE_REVIEW_TERMS)
-    if review_terms:
-        signals.extend(f"subjective UI feedback: {term}" for term in review_terms)
-        return _result(True, 4, signals, likely_surfaces, "review", "ui-ux-review", repo_signals)
-
     if non_ui_terms and not explicit_ui_terms:
         signals.extend(f"non-UI term: {term}" for term in non_ui_terms)
         return _result(False, 0, signals, likely_surfaces, "observe", "ui-ux-compass-router", repo_signals)
+
+    review_terms = _contains_any(normalized, SUBJECTIVE_REVIEW_TERMS)
+    if review_terms and explicit_ui_terms:
+        signals.extend(f"subjective UI feedback: {term}" for term in review_terms)
+        signals.extend(f"UI context term: {term}" for term in explicit_ui_terms)
+        return _result(True, 4, signals, likely_surfaces, "review", "ui-ux-review", repo_signals)
+    if review_terms:
+        signals.extend(f"subjective feedback without UI context: {term}" for term in review_terms)
 
     risk_2_terms = _contains_any(normalized, RISK_2_TERMS)
     local_change_terms = _contains_any(normalized, LOCAL_CHANGE_TERMS)

@@ -10,9 +10,21 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from scripts.detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
+    from scripts.detect_ui_surface import (
+        EXPLICIT_UI_TERMS,
+        SUBJECTIVE_REVIEW_TERMS,
+        _contains_any,
+        _matches_term,
+        detect_ui_surface,
+    )
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
-    from detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
+    from detect_ui_surface import (
+        EXPLICIT_UI_TERMS,
+        SUBJECTIVE_REVIEW_TERMS,
+        _contains_any,
+        _matches_term,
+        detect_ui_surface,
+    )
 
 
 QUESTION_MODES = {
@@ -88,6 +100,11 @@ def _is_subjective_prompt(prompt: str) -> bool:
     return any(_matches_term(normalized, term) for term in SUBJECTIVE_REVIEW_TERMS)
 
 
+def _has_subjective_ui_context(prompt: str) -> bool:
+    normalized = prompt.lower()
+    return _is_subjective_prompt(prompt) and bool(_contains_any(normalized, EXPLICIT_UI_TERMS))
+
+
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
     path = Path(csv_path)
     root = Path(repo_root)
@@ -103,6 +120,7 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
             predicted_mode = str(detected["recommended_mode"])
             predicted_should_ask = predicted_mode in QUESTION_MODES
             subjective = _is_subjective_prompt(row["prompt"])
+            subjective_ui_context = _has_subjective_ui_context(row["prompt"])
             rows.append({
                 "id": row["id"],
                 "prompt": row["prompt"],
@@ -117,23 +135,25 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
                 "false_question": not expected_should_ask and predicted_should_ask,
                 "risk_3_or_4_without_gate": expected_risk >= 3 and predicted_mode not in GATE_MODES,
                 "subjective": subjective,
-                "subjective_to_review": (not subjective) or predicted_mode == "review",
+                "subjective_ui_context": subjective_ui_context,
+                "subjective_to_review": (not subjective_ui_context) or predicted_mode == "review",
             })
 
     total = len(rows) or 1
     non_ask_total = sum(1 for row in rows if not row["expected_should_ask"]) or 1
-    subjective_total = sum(1 for row in rows if row["subjective"]) or 1
+    subjective_total = sum(1 for row in rows if row["subjective_ui_context"])
     false_question_count = sum(1 for row in rows if row["false_question"])
+    subjective_review_count = sum(1 for row in rows if row["subjective_ui_context"] and row["subjective_to_review"])
+    subjective_feedback_to_review_rate = (
+        1.0 if subjective_total == 0 else round(subjective_review_count / subjective_total, 3)
+    )
     metrics = {
         "total": len(rows),
         "risk_within_one_rate": round(sum(1 for row in rows if row["risk_within_one"]) / total, 3),
         "mode_accuracy": round(sum(1 for row in rows if row["mode_matches"]) / total, 3),
         "false_question_rate": round(false_question_count / non_ask_total, 3),
         "risk_3_or_4_without_gate": sum(1 for row in rows if row["risk_3_or_4_without_gate"]),
-        "subjective_feedback_to_review_rate": round(
-            sum(1 for row in rows if row["subjective"] and row["subjective_to_review"]) / subjective_total,
-            3,
-        ),
+        "subjective_feedback_to_review_rate": subjective_feedback_to_review_rate,
     }
     thresholds = expectations.get("success_metrics", {})
     failures = _evaluate_thresholds(metrics, thresholds)

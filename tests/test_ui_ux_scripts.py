@@ -87,6 +87,29 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["recommended_mode"], "review")
                     self.assertEqual(result["recommended_skill"], "ui-ux-review")
 
+    def test_non_ui_subjective_feedback_does_not_route_to_review(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        cases = [
+            ("这个后端接口太乱了", False, 0, "observe"),
+            ("数据库查询逻辑有点怪", False, 0, "observe"),
+            ("This API feels weird", False, 0, "observe"),
+            ("这个页面有点怪", True, 4, "review"),
+            ("This page feels weird", True, 4, "review"),
+            ("这个页面不好看，太挤了", True, 4, "review"),
+            ("这个 UI 模板感太强，不像真实产品", True, 4, "review"),
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt, ui_related, risk, mode in cases:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertEqual(result["ui_related"], ui_related)
+                    self.assertEqual(result["risk_level"], risk)
+                    self.assertEqual(result["recommended_mode"], mode)
+
     def test_chinese_ui_requests_route_by_risk(self):
         from scripts.detect_ui_surface import detect_ui_surface
 
