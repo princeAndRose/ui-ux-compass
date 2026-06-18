@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from scripts.detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
+    from scripts.detect_ui_surface import detect_ui_surface
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
-    from detect_ui_surface import SUBJECTIVE_REVIEW_TERMS, _matches_term, detect_ui_surface
+    from detect_ui_surface import detect_ui_surface
 
 
 QUESTION_MODES = {
@@ -83,11 +83,6 @@ def _evaluate_thresholds(metrics: dict[str, Any], thresholds: dict[str, Any]) ->
     return failures
 
 
-def _is_subjective_prompt(prompt: str) -> bool:
-    normalized = prompt.lower()
-    return any(_matches_term(normalized, term) for term in SUBJECTIVE_REVIEW_TERMS)
-
-
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
     path = Path(csv_path)
     root = Path(repo_root)
@@ -102,7 +97,11 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
             predicted_risk = int(detected["risk_level"])
             predicted_mode = str(detected["recommended_mode"])
             predicted_should_ask = predicted_mode in QUESTION_MODES
-            subjective = _is_subjective_prompt(row["prompt"])
+            # Ground truth for "is this subjective UI feedback" comes from the
+            # human-labeled expected mode, not from re-matching the detector's own
+            # keyword list -- otherwise the eval would quietly grade the detector
+            # against itself.
+            subjective = expected_mode == "review"
             rows.append({
                 "id": row["id"],
                 "prompt": row["prompt"],

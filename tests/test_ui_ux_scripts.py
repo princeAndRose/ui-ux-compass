@@ -87,6 +87,56 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["recommended_mode"], "review")
                     self.assertEqual(result["recommended_skill"], "ui-ux-review")
 
+    def test_ambiguous_subjective_terms_need_ui_corroboration(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        # Common words that double as design vocabulary must not hijack a clearly
+        # non-UI task into a Risk 4 review just by appearing in the sentence.
+        non_ui = [
+            "Turn off the analytics pipeline",
+            "Refactor the generic list utility",
+            "Add a hard to use CLI flag",
+            "The output format looks wrong",
+            "This API feels weird after the retry change",
+        ]
+        # The same ambiguous words are valid feedback once a UI surface is in scope.
+        still_review = [
+            "This page feels weird",
+            "The dashboard looks wrong",
+            "响应式布局有点怪",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in non_ui:
+                with self.subTest(non_ui=prompt):
+                    result = detect_ui_surface(root, prompt)
+                    self.assertFalse(result["ui_related"])
+                    self.assertEqual(result["recommended_mode"], "observe")
+            for prompt in still_review:
+                with self.subTest(review=prompt):
+                    result = detect_ui_surface(root, prompt)
+                    self.assertEqual(result["risk_level"], 4)
+                    self.assertEqual(result["recommended_mode"], "review")
+
+    def test_strong_subjective_term_about_non_ui_subject_is_not_review(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        with tempfile.TemporaryDirectory() as temp:
+            result = detect_ui_surface(Path(temp), "The database schema is ugly and hard to use")
+
+        self.assertFalse(result["ui_related"])
+        self.assertEqual(result["recommended_mode"], "observe")
+
+    def test_evidence_strength_replaces_confidence(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        with tempfile.TemporaryDirectory() as temp:
+            result = detect_ui_surface(Path(temp), "做一个新的仪表盘页面")
+
+        self.assertNotIn("confidence", result)
+        self.assertIn(result["evidence_strength"], {"strong", "medium", "weak"})
+
     def test_chinese_ui_requests_route_by_risk(self):
         from scripts.detect_ui_surface import detect_ui_surface
 

@@ -58,3 +58,8 @@ T056,"Add a dashboard with filters",3,mini-brief,true
 T057,"Add filters to dashboard",2,ask-one-question,true
 T058,"给仪表盘加筛选器",2,ask-one-question,true
 T059,"Add dashboard with filters",3,mini-brief,true
+T060,"Turn off the analytics pipeline",0,observe,false
+T061,"Refactor the generic list utility",0,observe,false
+T062,"Add a hard to use CLI flag",0,observe,false
+T063,"The output format looks wrong",0,observe,false
+T064,"This API feels weird after the retry change",0,observe,false

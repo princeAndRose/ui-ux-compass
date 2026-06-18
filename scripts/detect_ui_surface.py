@@ -10,7 +10,17 @@ from pathlib import Path
 from typing import Any
 
 
-SUBJECTIVE_REVIEW_TERMS = {
+# Subjective design vocabulary, split by how much it can be trusted on its own.
+#
+# "Strong" terms are unambiguous design language ("太丑", "ugly", "template-like").
+# A user only reaches for them when talking about how something looks, so they can
+# route to review by themselves.
+#
+# "Ambiguous" terms are everyday words that also mean something in non-UI code
+# ("turn it off", "a generic helper", "the API feels weird"). They only count as UI
+# feedback when the message carries other UI evidence -- a subjective judgement needs
+# an object before it can become a review.
+STRONG_SUBJECTIVE_TERMS = {
     "不高级",
     "不好看",
     "不像产品",
@@ -25,26 +35,32 @@ SUBJECTIVE_REVIEW_TERMS = {
     "太花",
     "套模板",
     "廉价",
-    "有点怪",
     "模板感",
     "没重点",
     "看起来怪",
     "视觉层级不清",
+    "像 demo",
     "ugly",
     "cramped",
-    "generic",
-    "feels weird",
     "template-like",
     "template like",
-    "off",
-    "too busy",
-    "too empty",
     "not premium",
     "not product-like",
-    "像 demo",
+}
+
+AMBIGUOUS_SUBJECTIVE_TERMS = {
+    "有点怪",
+    "off",
+    "generic",
+    "feels weird",
+    "too busy",
+    "too empty",
     "hard to use",
     "looks wrong",
 }
+
+# Backwards-compatible union for any external caller that imported the old name.
+SUBJECTIVE_REVIEW_TERMS = STRONG_SUBJECTIVE_TERMS | AMBIGUOUS_SUBJECTIVE_TERMS
 
 RISK_4_TERMS = {
     "复杂仪表盘",
@@ -426,10 +442,20 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
     likely_surfaces.extend(surfaces)
     non_ui_terms = _contains_any(normalized, NON_UI_TERMS)
     explicit_ui_terms = _contains_any(normalized, EXPLICIT_UI_TERMS)
+    general_ui_terms = _contains_any(normalized, GENERAL_UI_TERMS)
+    ui_evidence = bool(explicit_ui_terms or general_ui_terms or repo_signals)
 
-    review_terms = _contains_any(normalized, SUBJECTIVE_REVIEW_TERMS)
-    if review_terms:
-        signals.extend(f"subjective UI feedback: {term}" for term in review_terms)
+    # Subjective UI feedback routes to review -- but only when there is something to
+    # review. Strong design language stands on its own; ambiguous words need UI
+    # corroboration; and a complaint that is clearly about a non-UI subject (terms
+    # like "api"/"pipeline" with no UI evidence) is handed to the non-UI gate below
+    # instead of being pulled into a design review.
+    strong_review_terms = _contains_any(normalized, STRONG_SUBJECTIVE_TERMS)
+    ambiguous_review_terms = _contains_any(normalized, AMBIGUOUS_SUBJECTIVE_TERMS)
+    firing_review_terms = strong_review_terms + (ambiguous_review_terms if ui_evidence else [])
+    non_ui_dominant = bool(non_ui_terms) and not ui_evidence
+    if firing_review_terms and not non_ui_dominant:
+        signals.extend(f"subjective UI feedback: {term}" for term in firing_review_terms)
         return _result(True, 4, signals, likely_surfaces, "review", "ui-ux-review", repo_signals)
 
     if non_ui_terms and not explicit_ui_terms:
@@ -468,7 +494,7 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
         signals.extend(f"trivial UI term: {term}" for term in risk_1_terms)
         return _result(True, 1, signals, likely_surfaces, "apply-existing-conventions", "ui-ux-compass-router", repo_signals)
 
-    ui_terms = _contains_any(normalized, GENERAL_UI_TERMS)
+    ui_terms = general_ui_terms
     if ui_terms:
         signals.extend(f"general UI term: {term}" for term in ui_terms)
         risk = 2 if len(ui_terms) <= 2 else 3
@@ -490,23 +516,21 @@ def _result(
     repo_signals: list[str],
 ) -> dict[str, Any]:
     all_signals = signals + repo_signals
-    confidence = 0.15
-    if risk_level == 0:
-        confidence = 0.82 if signals else 0.68
-    elif risk_level == 1:
-        confidence = 0.72
-    elif risk_level == 2:
-        confidence = 0.78
-    elif risk_level == 3:
-        confidence = 0.86
-    elif risk_level == 4:
-        confidence = 0.9
-    if repo_signals and ui_related:
-        confidence = min(0.96, confidence + 0.05)
+    # Coarse, honest evidence tier -- deliberately not a probability. The old numeric
+    # "confidence" looked calibrated but was a hand-picked constant per risk level.
+    # This says only what we can actually back up: "strong" when the call rests on
+    # both message terms and repository signals, "weak" when it is a low-evidence
+    # inference the router should treat with extra skepticism.
+    if signals and repo_signals:
+        evidence_strength = "strong"
+    elif signals or repo_signals:
+        evidence_strength = "medium"
+    else:
+        evidence_strength = "weak"
     return {
         "ui_related": ui_related,
         "risk_level": risk_level,
-        "confidence": round(confidence, 2),
+        "evidence_strength": evidence_strength,
         "signals": all_signals,
         "likely_surfaces": sorted(set(likely_surfaces)),
         "recommended_mode": mode,
