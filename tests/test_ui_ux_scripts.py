@@ -131,6 +131,15 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["risk_level"], risk)
                     self.assertEqual(result["recommended_mode"], mode)
 
+    def test_evidence_strength_replaces_confidence(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        with tempfile.TemporaryDirectory() as temp:
+            result = detect_ui_surface(Path(temp), "做一个新的仪表盘页面")
+
+        self.assertNotIn("confidence", result)
+        self.assertIn(result["evidence_strength"], {"strong", "medium", "weak"})
+
     def test_chinese_non_ui_prompts_do_not_intervene(self):
         from scripts.detect_ui_surface import detect_ui_surface
 

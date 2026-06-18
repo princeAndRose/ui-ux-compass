@@ -497,23 +497,21 @@ def _result(
     repo_signals: list[str],
 ) -> dict[str, Any]:
     all_signals = signals + repo_signals
-    confidence = 0.15
-    if risk_level == 0:
-        confidence = 0.82 if signals else 0.68
-    elif risk_level == 1:
-        confidence = 0.72
-    elif risk_level == 2:
-        confidence = 0.78
-    elif risk_level == 3:
-        confidence = 0.86
-    elif risk_level == 4:
-        confidence = 0.9
-    if repo_signals and ui_related:
-        confidence = min(0.96, confidence + 0.05)
+    # Coarse, honest evidence tier -- deliberately not a probability. The old numeric
+    # "confidence" looked calibrated but was a hand-picked constant per risk level.
+    # This says only what we can actually back up: "strong" when the call rests on
+    # both message terms and repository signals, "weak" when it is a low-evidence
+    # inference the router should treat with extra skepticism.
+    if signals and repo_signals:
+        evidence_strength = "strong"
+    elif signals or repo_signals:
+        evidence_strength = "medium"
+    else:
+        evidence_strength = "weak"
     return {
         "ui_related": ui_related,
         "risk_level": risk_level,
-        "confidence": round(confidence, 2),
+        "evidence_strength": evidence_strength,
         "signals": all_signals,
         "likely_surfaces": sorted(set(likely_surfaces)),
         "recommended_mode": mode,
