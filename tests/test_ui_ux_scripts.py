@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 class DetectUiSurfaceTests(unittest.TestCase):
@@ -109,6 +110,58 @@ class DetectUiSurfaceTests(unittest.TestCase):
                     self.assertEqual(result["ui_related"], ui_related)
                     self.assertEqual(result["risk_level"], risk)
                     self.assertEqual(result["recommended_mode"], mode)
+
+    def test_non_ui_subjective_feedback_with_broad_style_term_does_not_route_to_review(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        prompts = [
+            "This API style is ugly",
+            "The backend style feels weird",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in prompts:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertFalse(result["ui_related"])
+                    self.assertEqual(result["risk_level"], 0)
+                    self.assertEqual(result["recommended_mode"], "observe")
+
+    def test_strong_aesthetic_feedback_without_ui_noun_routes_to_review(self):
+        from scripts.detect_ui_surface import detect_ui_surface
+
+        prompts = [
+            "太丑了，不高级，有点廉价",
+            "Looks ugly and not premium",
+        ]
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for prompt in prompts:
+                with self.subTest(prompt=prompt):
+                    result = detect_ui_surface(root, prompt)
+
+                    self.assertTrue(result["ui_related"])
+                    self.assertEqual(result["risk_level"], 4)
+                    self.assertEqual(result["recommended_mode"], "review")
+
+    def test_detector_base_term_groups_are_disjoint(self):
+        from scripts import detect_ui_surface as detector
+
+        seen: dict[str, str] = {}
+        duplicates: dict[str, list[str]] = {}
+        for group_name, terms in detector.BASE_TERM_GROUPS.items():
+            for term in terms:
+                if term in seen:
+                    duplicates.setdefault(term, [seen[term]]).append(group_name)
+                else:
+                    seen[term] = group_name
+
+        self.assertEqual(duplicates, {})
+        self.assertTrue(detector.RISK_3_TERMS <= detector.SURFACE_CREATION_TERMS)
+        self.assertTrue(detector.RISK_4_TERMS <= detector.SURFACE_CREATION_TERMS)
 
     def test_chinese_ui_requests_route_by_risk(self):
         from scripts.detect_ui_surface import detect_ui_surface
@@ -590,6 +643,103 @@ class TriggerEvalTests(unittest.TestCase):
 
         self.assertFalse(result["passed"])
         self.assertIn("risk_within_one_rate", result["failures"])
+
+    def test_trigger_eval_does_not_use_expected_review_label_for_subjective_metric(self):
+        from scripts.run_trigger_evals import run_trigger_evals
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cases = root / "trigger-cases.csv"
+            expected = root / "expected-routing.json"
+            cases.write_text(
+                "id,prompt,expected_risk,expected_mode,should_ask\n"
+                'T001,"This API feels weird",0,review,true\n',
+                encoding="utf-8",
+            )
+            expected.write_text(json.dumps({
+                "success_metrics": {
+                    "risk_level_within_one": 0.0,
+                    "mode_accuracy": 0.0,
+                    "false_question_rate_max": 1.0,
+                    "risk_3_or_4_without_spec_or_assumptions_gate": 0,
+                    "subjective_feedback_to_review": 1.0,
+                }
+            }), encoding="utf-8")
+
+            result = run_trigger_evals(cases, root)
+
+        self.assertTrue(result["passed"])
+        self.assertFalse(result["cases"][0]["subjective_ui_context"])
+        self.assertNotIn("subjective_feedback_to_review_rate", result["failures"])
+
+    def test_trigger_eval_subjective_terms_use_word_boundaries(self):
+        from scripts.run_trigger_evals import _subjective_review_target
+
+        self.assertEqual(_subjective_review_target("Update office page layout"), (False, False))
+
+    def test_trigger_eval_subjective_metric_does_not_trust_expected_label(self):
+        from scripts.run_trigger_evals import run_trigger_evals
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cases = root / "trigger-cases.csv"
+            expected = root / "expected-routing.json"
+            cases.write_text(
+                "id,prompt,expected_risk,expected_mode,should_ask\n"
+                'T001,"Looks ugly and not premium",0,observe,false\n',
+                encoding="utf-8",
+            )
+            expected.write_text(json.dumps({
+                "success_metrics": {
+                    "risk_level_within_one": 0.0,
+                    "mode_accuracy": 0.0,
+                    "false_question_rate_max": 1.0,
+                    "risk_3_or_4_without_spec_or_assumptions_gate": 0,
+                    "subjective_feedback_to_review": 1.0,
+                }
+            }), encoding="utf-8")
+
+            with patch("scripts.run_trigger_evals.detect_ui_surface", return_value={
+                "risk_level": 0,
+                "recommended_mode": "observe",
+            }):
+                result = run_trigger_evals(cases, root)
+
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["subjective_feedback_to_review_rate"], 0.0)
+        self.assertIn("subjective_feedback_to_review_rate", result["failures"])
+
+    def test_trigger_eval_counts_information_hierarchy_feedback_as_subjective(self):
+        from scripts.run_trigger_evals import run_trigger_evals
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cases = root / "trigger-cases.csv"
+            expected = root / "expected-routing.json"
+            cases.write_text(
+                "id,prompt,expected_risk,expected_mode,should_ask\n"
+                'T001,"看起来有点怪，信息层级不清",0,observe,false\n',
+                encoding="utf-8",
+            )
+            expected.write_text(json.dumps({
+                "success_metrics": {
+                    "risk_level_within_one": 0.0,
+                    "mode_accuracy": 0.0,
+                    "false_question_rate_max": 1.0,
+                    "risk_3_or_4_without_spec_or_assumptions_gate": 0,
+                    "subjective_feedback_to_review": 1.0,
+                }
+            }), encoding="utf-8")
+
+            with patch("scripts.run_trigger_evals.detect_ui_surface", return_value={
+                "risk_level": 0,
+                "recommended_mode": "observe",
+            }):
+                result = run_trigger_evals(cases, root)
+
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["subjective_feedback_to_review_rate"], 0.0)
+        self.assertIn("subjective_feedback_to_review_rate", result["failures"])
 
 
 class WorkflowEvalTests(unittest.TestCase):

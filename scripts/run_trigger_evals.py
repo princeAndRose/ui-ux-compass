@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -15,21 +16,9 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution
     from cli_io import enable_utf8_output
 
 try:
-    from scripts.detect_ui_surface import (
-        EXPLICIT_UI_TERMS,
-        SUBJECTIVE_REVIEW_TERMS,
-        _contains_any,
-        _matches_term,
-        detect_ui_surface,
-    )
+    from scripts.detect_ui_surface import detect_ui_surface
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
-    from detect_ui_surface import (
-        EXPLICIT_UI_TERMS,
-        SUBJECTIVE_REVIEW_TERMS,
-        _contains_any,
-        _matches_term,
-        detect_ui_surface,
-    )
+    from detect_ui_surface import detect_ui_surface
 
 
 QUESTION_MODES = {
@@ -50,6 +39,84 @@ GATE_MODES = {
     "acceptance",
 }
 
+EVAL_STRONG_SUBJECTIVE_REVIEW_TERMS = {
+    "不高级",
+    "不好看",
+    "太丑",
+    "太乱",
+    "太挤",
+    "太空",
+    "太花",
+    "廉价",
+    "模板感",
+    "没重点",
+    "信息层级不清",
+    "视觉层级不清",
+    "ugly",
+    "cramped",
+    "template-like",
+    "template like",
+    "too busy",
+    "too empty",
+    "not premium",
+    "not product-like",
+}
+
+EVAL_AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS = {
+    "有点怪",
+    "看起来怪",
+    "generic",
+    "feels weird",
+    "off",
+    "hard to use",
+    "looks wrong",
+}
+
+EVAL_UI_CONTEXT_TERMS = {
+    "ui",
+    "ux",
+    "page",
+    "screen",
+    "layout",
+    "component",
+    "dashboard",
+    "landing",
+    "form",
+    "modal",
+    "button",
+    "card",
+    "页面",
+    "界面",
+    "布局",
+    "组件",
+    "仪表盘",
+    "落地页",
+    "表单",
+    "弹窗",
+    "按钮",
+    "卡片",
+    "信息层级",
+}
+
+EVAL_NON_UI_TERMS = {
+    "api",
+    "backend",
+    "database",
+    "query",
+    "server",
+    "unit test",
+    "tests",
+    "docs",
+    "pipeline",
+    "后端",
+    "接口",
+    "数据库",
+    "查询",
+    "服务端",
+    "测试",
+    "文档",
+}
+
 
 def _bool(value: str) -> bool:
     return value.strip().lower() == "true"
@@ -58,6 +125,19 @@ def _bool(value: str) -> bool:
 def _mode_matches(expected_mode: str, predicted_mode: str) -> bool:
     allowed = {part.strip() for part in expected_mode.split(" or ") if part.strip()}
     return predicted_mode in allowed
+
+
+def _contains_term(normalized: str, term: str) -> bool:
+    normalized_term = term.lower()
+    if re.search(r"[\u4e00-\u9fff]", normalized_term):
+        return normalized_term in normalized
+    escaped = re.escape(normalized_term).replace(r"\ ", r"\s+")
+    pattern = rf"(?<![a-z0-9_-]){escaped}(?![a-z0-9_-])"
+    return re.search(pattern, normalized, flags=re.IGNORECASE) is not None
+
+
+def _contains_any(normalized: str, terms: set[str]) -> list[str]:
+    return sorted(term for term in terms if _contains_term(normalized, term))
 
 
 def _load_expectations(csv_path: Path) -> dict[str, Any]:
@@ -100,14 +180,16 @@ def _evaluate_thresholds(metrics: dict[str, Any], thresholds: dict[str, Any]) ->
     return failures
 
 
-def _is_subjective_prompt(prompt: str) -> bool:
+def _subjective_review_target(prompt: str) -> tuple[bool, bool]:
     normalized = prompt.lower()
-    return any(_matches_term(normalized, term) for term in SUBJECTIVE_REVIEW_TERMS)
-
-
-def _has_subjective_ui_context(prompt: str) -> bool:
-    normalized = prompt.lower()
-    return _is_subjective_prompt(prompt) and bool(_contains_any(normalized, EXPLICIT_UI_TERMS))
+    strong_terms = _contains_any(normalized, EVAL_STRONG_SUBJECTIVE_REVIEW_TERMS)
+    ambiguous_terms = _contains_any(normalized, EVAL_AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS)
+    ui_terms = _contains_any(normalized, EVAL_UI_CONTEXT_TERMS)
+    non_ui_terms = _contains_any(normalized, EVAL_NON_UI_TERMS)
+    subjective = bool(strong_terms or ambiguous_terms)
+    clear_non_ui = bool(non_ui_terms and not ui_terms)
+    review_target = bool((strong_terms and not clear_non_ui) or (ambiguous_terms and ui_terms))
+    return subjective, review_target
 
 
 def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, Any]:
@@ -124,8 +206,7 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
             predicted_risk = int(detected["risk_level"])
             predicted_mode = str(detected["recommended_mode"])
             predicted_should_ask = predicted_mode in QUESTION_MODES
-            subjective = _is_subjective_prompt(row["prompt"])
-            subjective_ui_context = _has_subjective_ui_context(row["prompt"])
+            subjective, subjective_review_target = _subjective_review_target(row["prompt"])
             rows.append({
                 "id": row["id"],
                 "prompt": row["prompt"],
@@ -140,8 +221,8 @@ def run_trigger_evals(csv_path: Path | str, repo_root: Path | str) -> dict[str, 
                 "false_question": not expected_should_ask and predicted_should_ask,
                 "risk_3_or_4_without_gate": expected_risk >= 3 and predicted_mode not in GATE_MODES,
                 "subjective": subjective,
-                "subjective_ui_context": subjective_ui_context,
-                "subjective_to_review": (not subjective_ui_context) or predicted_mode == "review",
+                "subjective_ui_context": subjective_review_target,
+                "subjective_to_review": (not subjective_review_target) or predicted_mode == "review",
             })
 
     total = len(rows) or 1
