@@ -20,7 +20,7 @@ T018,"Update information schema docs",0,observe,false
 T019,"这个页面不好看，太挤了",4,review,true
 T020,"这个 UI 模板感太强，不像真实产品",4,review,true
 T021,"看起来有点怪，信息层级不清",4,review,true
-T022,"太丑了，不高级，有点廉价",0,observe,false
+T022,"太丑了，不高级，有点廉价",4,review,true
 T023,"做一个新的仪表盘页面",3,mini-brief,true
 T024,"新增管理后台页面",3,mini-brief,true
 T025,"帮我做设置页",3,mini-brief,true
@@ -63,3 +63,4 @@ T061,"数据库查询逻辑有点怪",0,observe,false
 T062,"This API feels weird",0,observe,false
 T063,"这个页面有点怪",4,review,true
 T064,"This page feels weird",4,review,true
+T065,"This API style is ugly",0,observe,false

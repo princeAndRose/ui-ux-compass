@@ -15,7 +15,8 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution
     from cli_io import enable_utf8_output
 
 
-SUBJECTIVE_REVIEW_TERMS = {
+
+STRONG_SUBJECTIVE_REVIEW_TERMS = {
     "不高级",
     "不好看",
     "不像产品",
@@ -30,26 +31,31 @@ SUBJECTIVE_REVIEW_TERMS = {
     "太花",
     "套模板",
     "廉价",
-    "有点怪",
     "模板感",
     "没重点",
-    "看起来怪",
     "视觉层级不清",
     "ugly",
     "cramped",
-    "generic",
-    "feels weird",
     "template-like",
     "template like",
-    "off",
     "too busy",
     "too empty",
     "not premium",
     "not product-like",
     "像 demo",
+}
+
+AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS = {
+    "有点怪",
+    "看起来怪",
+    "generic",
+    "feels weird",
+    "off",
     "hard to use",
     "looks wrong",
 }
+
+SUBJECTIVE_REVIEW_TERMS = STRONG_SUBJECTIVE_REVIEW_TERMS | AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS
 
 RISK_4_TERMS = {
     "复杂仪表盘",
@@ -384,6 +390,61 @@ ASSUMPTIONS_GATE_TERMS = {
     "选中态",
 }
 
+_OLD_GENERAL_UI_TERMS = set(GENERAL_UI_TERMS)
+_OLD_EXPLICIT_UI_TERMS = set(EXPLICIT_UI_TERMS)
+_OLD_NEW_SURFACE_TERMS = set(NEW_SURFACE_TERMS)
+_OLD_SURFACE_CREATION_TERMS = set(SURFACE_CREATION_TERMS)
+
+_RISK_TERM_GROUPS = {
+    "risk_4": RISK_4_TERMS,
+    "risk_3": RISK_3_TERMS,
+    "risk_2": RISK_2_TERMS,
+    "risk_1": RISK_1_TERMS,
+}
+_RISK_TERMS = set().union(*_RISK_TERM_GROUPS.values())
+_GENERAL_UI_BASE_TERMS = _OLD_GENERAL_UI_TERMS - _RISK_TERMS
+_EXPLICIT_UI_BASE_TERMS = _OLD_EXPLICIT_UI_TERMS - _RISK_TERMS - _GENERAL_UI_BASE_TERMS
+_NEW_SURFACE_BASE_TERMS = _OLD_NEW_SURFACE_TERMS - _RISK_TERMS - _GENERAL_UI_BASE_TERMS - _EXPLICIT_UI_BASE_TERMS
+_SURFACE_CREATION_BASE_TERMS = (
+    _OLD_SURFACE_CREATION_TERMS
+    - _RISK_TERMS
+    - _GENERAL_UI_BASE_TERMS
+    - _EXPLICIT_UI_BASE_TERMS
+    - _NEW_SURFACE_BASE_TERMS
+)
+
+BASE_TERM_GROUPS = {
+    **_RISK_TERM_GROUPS,
+    "strong_subjective_review": STRONG_SUBJECTIVE_REVIEW_TERMS,
+    "ambiguous_subjective_review": AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS,
+    "general_ui": _GENERAL_UI_BASE_TERMS,
+    "explicit_ui_extra": _EXPLICIT_UI_BASE_TERMS,
+    "new_surface_cues": _NEW_SURFACE_BASE_TERMS,
+    "surface_creation_extra": _SURFACE_CREATION_BASE_TERMS,
+    "non_ui": NON_UI_TERMS,
+}
+
+GENERAL_UI_TERMS = _RISK_TERMS | _GENERAL_UI_BASE_TERMS
+EXPLICIT_UI_TERMS = (
+    (_OLD_EXPLICIT_UI_TERMS & _RISK_TERMS)
+    | (_OLD_EXPLICIT_UI_TERMS & _GENERAL_UI_BASE_TERMS)
+    | _EXPLICIT_UI_BASE_TERMS
+)
+NEW_SURFACE_TERMS = (
+    _NEW_SURFACE_BASE_TERMS
+    | (_OLD_NEW_SURFACE_TERMS & (_RISK_TERMS | _GENERAL_UI_BASE_TERMS | _EXPLICIT_UI_BASE_TERMS))
+)
+SURFACE_CREATION_TERMS = (
+    _SURFACE_CREATION_BASE_TERMS
+    | NEW_SURFACE_TERMS
+    | RISK_3_TERMS
+    | RISK_4_TERMS
+    | (_OLD_SURFACE_CREATION_TERMS & (_GENERAL_UI_BASE_TERMS | _EXPLICIT_UI_BASE_TERMS))
+)
+
+BROAD_REVIEW_CONTEXT_TERMS = {"css", "style", "tailwind"}
+REVIEW_UI_CONTEXT_TERMS = EXPLICIT_UI_TERMS - BROAD_REVIEW_CONTEXT_TERMS
+
 
 def _contains_cjk(value: str) -> bool:
     return re.search(r"[\u4e00-\u9fff]", value) is not None
@@ -436,14 +497,27 @@ def detect_ui_surface(repo_root: Path | str, message: str) -> dict[str, Any]:
     non_ui_terms = _contains_any(normalized, NON_UI_TERMS)
     explicit_ui_terms = _contains_any(normalized, EXPLICIT_UI_TERMS)
 
+    # Branch precedence matters: non-UI veto first, then subjective review,
+    # then increasingly concrete UI routing hints. Strong aesthetic feedback
+    # may route to review without an explicit UI noun unless a non-UI term
+    # already made the message clearly backend/infra/test work.
     if non_ui_terms and not explicit_ui_terms:
         signals.extend(f"non-UI term: {term}" for term in non_ui_terms)
         return _result(False, 0, signals, likely_surfaces, "observe", "ui-ux-compass-router", repo_signals)
 
-    review_terms = _contains_any(normalized, SUBJECTIVE_REVIEW_TERMS)
-    if review_terms and explicit_ui_terms:
+    strong_review_terms = _contains_any(normalized, STRONG_SUBJECTIVE_REVIEW_TERMS)
+    ambiguous_review_terms = _contains_any(normalized, AMBIGUOUS_SUBJECTIVE_REVIEW_TERMS)
+    review_terms = sorted(set(strong_review_terms + ambiguous_review_terms))
+    review_ui_context_terms = [term for term in explicit_ui_terms if term in REVIEW_UI_CONTEXT_TERMS]
+    clear_non_ui_subjective = bool(non_ui_terms and not review_ui_context_terms)
+    if review_terms and clear_non_ui_subjective:
+        signals.extend(f"non-UI term: {term}" for term in non_ui_terms)
+        signals.extend(f"subjective feedback without UI context: {term}" for term in review_terms)
+        return _result(False, 0, signals, likely_surfaces, "observe", "ui-ux-compass-router", repo_signals)
+    if strong_review_terms or (ambiguous_review_terms and review_ui_context_terms):
         signals.extend(f"subjective UI feedback: {term}" for term in review_terms)
-        signals.extend(f"UI context term: {term}" for term in explicit_ui_terms)
+        if review_ui_context_terms:
+            signals.extend(f"UI context term: {term}" for term in review_ui_context_terms)
         return _result(True, 4, signals, likely_surfaces, "review", "ui-ux-review", repo_signals)
     if review_terms:
         signals.extend(f"subjective feedback without UI context: {term}" for term in review_terms)
@@ -504,10 +578,10 @@ def _result(
     all_signals = signals + repo_signals
     # Coarse, honest evidence tier -- deliberately not a probability. The old numeric
     # "confidence" looked calibrated but was a hand-picked constant per risk level.
-    # This says only what we can actually back up: "strong" when the call rests on
-    # both message terms and repository signals, "weak" when it is a low-evidence
-    # inference the router should treat with extra skepticism.
-    if signals and repo_signals:
+    # This says only what we can actually back up: "strong" when a UI routing call
+    # rests on both message terms and repository signals, "weak" when it is a
+    # low-evidence inference the router should treat with extra skepticism.
+    if ui_related and signals and repo_signals:
         evidence_strength = "strong"
     elif signals or repo_signals:
         evidence_strength = "medium"
