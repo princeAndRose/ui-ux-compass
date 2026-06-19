@@ -8,6 +8,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+try:
+    from scripts.cli_io import enable_utf8_output
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    from cli_io import enable_utf8_output
+
 
 PAGE_FILENAMES = {"page.tsx", "page.jsx", "page.ts", "page.js"}
 LAYOUT_FILENAMES = {"layout.tsx", "layout.jsx", "layout.ts", "layout.js"}
@@ -94,6 +99,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    enable_utf8_output()
     try:
         raise SystemExit(main())
     except Exception as exc:  # pragma: no cover

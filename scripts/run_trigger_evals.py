@@ -10,6 +10,11 @@ from pathlib import Path
 from typing import Any
 
 try:
+    from scripts.cli_io import enable_utf8_output
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    from cli_io import enable_utf8_output
+
+try:
     from scripts.detect_ui_surface import (
         EXPLICIT_UI_TERMS,
         SUBJECTIVE_REVIEW_TERMS,
@@ -178,6 +183,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    enable_utf8_output()
     try:
         raise SystemExit(main())
     except Exception as exc:  # pragma: no cover

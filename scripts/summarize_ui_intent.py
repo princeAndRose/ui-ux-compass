@@ -8,6 +8,11 @@ import json
 from pathlib import Path
 
 try:
+    from scripts.cli_io import enable_utf8_output
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    from cli_io import enable_utf8_output
+
+try:
     from scripts.render_ui_state import render_state
     from scripts.update_ui_state import load_state, state_path
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
@@ -36,6 +41,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    enable_utf8_output()
     try:
         raise SystemExit(main())
     except Exception as exc:  # pragma: no cover
