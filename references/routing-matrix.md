@@ -1,81 +1,17 @@
-# Routing Matrix
+# Routing examples
 
-Use this matrix after `ui-ux-compass-router` gathers model judgment, deterministic detector result, repo evidence, and prior conversation. Choose the lowest risk level that handles the real ambiguity.
+The detector's 0–4 levels remain impact hints for compatibility. They do not prescribe interview length or a fixed skill chain.
 
-## Risk 0: Non-UI
+| Situation | Evidence / unknown | Useful action |
+| --- | --- | --- |
+| Backend change mentions dashboard | No user-facing change | No intervention |
+| Button spacing in an existing system | Requirement and convention clear | Implement, verify locally |
+| New landing page with approved design | High impact, little ambiguity | Implement with relevant checks |
+| New dashboard with undefined audience/task | A decision would change layout/content | Capture known context; ask the highest-value question |
+| Existing page "feels cramped" | Need rendered evidence | Inspect and diagnose; change only justified aspects |
+| Small destructive-action copy change | Outcome or reversibility ambiguous | Resolve meaning before choosing copy |
+| Brand wants expressive gradients/type | Explicit creative direction | Preserve expression; verify hierarchy, readability, task fit |
+| High-density operational queue | Expert comparison task | Preserve useful density; test selection and recovery |
+| User changes a confirmed direction | Prior choice superseded | Update scoped state; do not reapply stale defaults |
 
-Examples:
-
-- Backend API
-- Database schema
-- Tests
-- Infra config
-- Dependency upgrade
-- Internal refactor without user-facing behavior change
-
-Action:
-
-Do not intervene. Continue normally.
-
-## Risk 1: Trivial UI
-
-Examples:
-
-- Button text
-- Icon alignment
-- CSS typo
-- Existing component variant
-- TypeScript error inside a UI component without design implications
-
-Action:
-
-Proceed with existing conventions. Do not ask UX questions.
-
-## Risk 2: Local UI Ambiguity
-
-Examples:
-
-- Add a table filter
-- Add an empty state
-- Add a selected state
-- Add dark mode using existing tokens
-- Adjust spacing on an existing page
-
-Action:
-
-Ask one high-leverage question or state assumptions. Do not run a full brief.
-
-## Risk 3: New Page Or Flow
-
-Examples:
-
-- Dashboard
-- Settings page
-- Admin management page
-- Form flow
-- Report page
-
-Action:
-
-Run `ui-ux-capture-intent`, then `ui-ux-brief` or an assumptions gate. Produce a UI Intent Spec before implementation.
-
-## Risk 4: Core, Subjective, Or High-Fidelity
-
-Examples:
-
-- Landing page
-- Pricing page
-- Flagship dashboard
-- Onboarding
-- Editor layout
-- User says "ugly", "too cramped", "generic", "template-like", or "not product-like"
-
-Action:
-
-Use the full flow or review path:
-
-```text
-capture-intent -> full-brief -> direction -> wireframe -> implementation-gate -> review -> acceptance
-```
-
-For subjective feedback, start with `ui-ux-review`.
+The smallest sufficient intervention may be a sentence, an implementation, a prototype, or a full brief. Use a full discovery/direction/wireframe flow when its decisions are actually unresolved, or when the user asks for that process.

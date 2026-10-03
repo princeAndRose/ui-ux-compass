@@ -1,0 +1,14 @@
+{
+  "resources_used": [
+    "<run>/task.json",
+    "<plugin>/skills/ui-ux-compass-router/SKILL.md",
+    "<plugin>/skills/ui-ux-acceptance/SKILL.md"
+  ],
+  "questions": [],
+  "actions": [
+    "Changed the supplied toolbar gap declaration from 8px to 12px.",
+    "Preserved every other supplied CSS declaration.",
+    "Saved the corrected CSS snippet in output.md."
+  ],
+  "verification": "Compared the output snippet with the supplied CSS: gap is the only changed declaration. No browser build was run, as requested."
+}

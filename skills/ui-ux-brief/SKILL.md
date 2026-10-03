@@ -1,40 +1,14 @@
 ---
 name: ui-ux-brief
-description: Use when creating a new page, flow, dashboard, editor, form, settings screen, onboarding, landing page, or substantial UI surface and the product intent, user task, information hierarchy, interaction flow, or acceptance criteria are unclear.
+description: Resolve consequential missing requirements for a UI task and produce a concise design brief.
 ---
 
 # UI/UX Brief
 
-Run the minimum useful UX interview and produce a UI Intent Spec.
+Read relevant existing intent first using `ui-ux-capture-intent`. Ask only questions whose answers would materially change the solution. There is no minimum interview length or requirement to revisit an approved design.
 
-Ask one question at a time. Every question must explain why it matters, provide 2-4 options, and include a recommendation. The user may answer with an option, override it, or say "use recommendation".
+Explain the tradeoff and offer a recommendation when supported. A factual question is appropriate when options would invent the answer. Honor the user's question budget and prior answers.
 
-## Question Budget
+Cover the core task, intended audience, selected system/platform, critical content/actions, constraints, and observable acceptance checks at the depth needed for this change. Leave optional details to implementation judgment. Record reversible assumptions without requiring a new approval step; missing authorization is never supplied by silence.
 
-- Default: 5-8 questions.
-- Core product surface or high-fidelity work: up to 16 questions.
-- Fast mode: use an assumptions gate instead of a long interview.
-- Summarize after every 5-7 questions.
-
-## Question Priority
-
-1. Page role
-2. Target user
-3. Core user task
-4. First visual focus
-5. P0/P1/P2 information hierarchy
-6. Main CTA
-7. User path
-8. Required states
-9. Layout model
-10. Information density
-11. Visual tone
-12. Anti-goals
-13. Implementation constraints
-14. Acceptance criteria
-
-## Output
-
-Use `references/ui-intent-spec-template.md`, `references/prompt-contracts.md`, `references/surface-playbooks.md`, `references/state-patterns.md`, and `references/feedback-translation-table.md`.
-
-Never ask vague aesthetic questions. Translate subjective preference into product-relevant axes such as density, hierarchy, structure, tone, state coverage, and interaction priority.
+Use [references/ui-intent-spec-template.md](../../references/ui-intent-spec-template.md) for substantial work; omit inapplicable sections. Consult [references/surface-playbooks.md](../../references/surface-playbooks.md) and [references/state-patterns.md](../../references/state-patterns.md) selectively.

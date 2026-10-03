@@ -1,43 +1,18 @@
 ---
 name: ui-ux-state
-description: Use to read, update, summarize, or persist UI/UX Compass state including user UI preferences, project product context, design system conventions, page-level UI Intent Specs, decisions, assumptions, and acceptance status.
+description: Read or persist project-specific UI decisions, design-system choices, assumptions, and verification evidence.
 ---
 
 # UI/UX State
 
-Maintain UI/UX Compass state without confusing assumptions with confirmed decisions.
+Keep facts, user-confirmed decisions, and assumptions separate. Reuse scoped decisions; revisit them when the user changes direction or evidence becomes stale.
 
-Use runtime state for plugin-level cache and project state for repository-specific UI intent.
+- Project: `.ui-ux-compass/state.json` in the user's repository.
+- Optional runtime cache: `PLUGIN_DATA/ui-ux-compass-state.json`.
+- Optional page notes: `.ui-ux-compass/pages/<page-id>.md`.
 
-## Storage
+Persist when requested or within the authorized workflow. Otherwise return a proposed patch. Do not ask again for authorization already supplied. `--create` is a filesystem control, not a mandatory extra user approval.
 
-- Runtime state: `PLUGIN_DATA/ui-ux-compass-state.json`
-- Project state: `.ui-ux-compass/state.json`
-- Page notes: `.ui-ux-compass/pages/<page-id>.md`
+Record the selected system, platform, source, and scope. Do not infer universal taste from one page, promote assumptions to confirmed, or overwrite explicit choices with defaults. Record evidence/revisit conditions; do not claim automatic stale detection.
 
-Do not create project state silently. If `.ui-ux-compass/` does not exist, ask before writing or output a state patch in the response.
-
-## Source Rules
-
-- `user-confirmed`: user explicitly chose or confirmed it.
-- `project-fact`: verified from project files or design system.
-- `agent-assumption`: inferred by the agent and not confirmed.
-
-Never write an agent assumption as a confirmed decision.
-
-State schema v2 is source-aware:
-
-- Project and design-system context is split into `facts`, `confirmed`, and `assumptions`.
-- User preferences are split into `defaults`, `confirmed`, and `assumptions`.
-- `project-fact` patches may update facts; `user-confirmed` patches may update confirmed preferences/decisions; `agent-assumption` patches may update only assumptions.
-- Existing v1 state is migrated on load by `scripts/update_ui_state.py`.
-
-## Supported Actions
-
-- Read current state.
-- Generate a state patch.
-- Merge confirmed decisions after user approval.
-- Render a Markdown summary.
-- Generate a page-level UI Intent Spec.
-
-Use `scripts/update_ui_state.py`, `scripts/render_ui_state.py`, `scripts/summarize_ui_intent.py`, and `references/state-schema.md`.
+Read [references/state-schema.md](../../references/state-schema.md) when changing state. Resolve [scripts/update_ui_state.py](../../scripts/update_ui_state.py), [scripts/render_ui_state.py](../../scripts/render_ui_state.py), and [scripts/summarize_ui_intent.py](../../scripts/summarize_ui_intent.py) from this skill's installed location; pass the target repository independently. Core workflows must work without hooks.

@@ -1,5 +1,7 @@
 # Surface Playbooks
 
+These are contextual examples and diagnostic hypotheses, not universal rules. Apply the selected platform, design system and task constraints first; verify an actual consequence before treating a visual choice as a defect. See [design-systems.md](design-systems.md) and [design-quality-rubric.md](design-quality-rubric.md).
+
 Use this as the first reference when the user asks for a page, screen, flow, or product surface. Pick the closest surface, then adapt to repo conventions.
 
 | Surface | Role | Core tasks | Default archetype | P0 / P1 / P2 | Density | Required states | Common anti-patterns | Review focus | Implementation constraints |

@@ -1,0 +1,39 @@
+{
+  "brief": "Propose the settings structure for a macOS focus journal. Deliver a short interaction specification, not code.",
+  "context": "Users write daily notes. Available options: default reminder time, weekly summary on/off, follow system appearance, current-note sort order, and export current note. The app has no settings screen yet. Existing primary navigation is Journal and History.",
+  "constraints": [
+    "Keep current-note operations close to the note.",
+    "Do not invent accounts, subscriptions or notification permissions already granted."
+  ],
+  "design_system": "Apple HIG-inspired macOS",
+  "checks": [
+    {
+      "id": "task-options-local",
+      "kind": "heuristic",
+      "criterion": "Places current-note sorting and export in the note context, with a reason tied to use during writing.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "defaults-explicit",
+      "kind": "hard",
+      "criterion": "States reminder default and distinguishes a stored preference from permission to deliver notifications.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "system-respected",
+      "kind": "heuristic",
+      "criterion": "Uses system appearance as the stated default rather than duplicating global accessibility preferences.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "scope-kept",
+      "kind": "process",
+      "criterion": "Produces a specification without implementation or a mandatory wireframe approval round.",
+      "evidence": "trace",
+      "required": true
+    }
+  ]
+}

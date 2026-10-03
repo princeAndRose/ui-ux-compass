@@ -1,0 +1,44 @@
+{
+  "task_id": "apple-settings-plan",
+  "artifact": "output.md",
+  "resources_used": [
+    {
+      "type": "task",
+      "path": "<run>/task.json"
+    },
+    {
+      "type": "skill",
+      "path": "<plugin>/skills/ui-ux-compass-router/SKILL.md"
+    },
+    {
+      "type": "reference",
+      "path": "<plugin>/references/design-systems.md",
+      "section_used": "Apple Human Interface Guidelines"
+    },
+    {
+      "type": "skill",
+      "path": "<plugin>/skills/ui-ux-acceptance/SKILL.md",
+      "use": "Specification scope and future interaction checks"
+    },
+    {
+      "type": "web",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/settings",
+      "access_date": "2026-10-03",
+      "access_note": "Direct open returned JavaScript requirement; official-domain search returned guideline text, including task-specific options and macOS settings window guidance."
+    }
+  ],
+  "questions_asked": [],
+  "assumptions_recorded": [
+    "Sort applies to an existing sortable collection within the selected note; supported order labels are unspecified.",
+    "8:00 PM reminder and weekly summary off are proposed defaults, not confirmed user facts.",
+    "System appearance is the sole specified appearance behavior; no manual override is introduced."
+  ],
+  "work_performed": [
+    "Produced a short interaction specification covering all five supplied options.",
+    "Specified future interaction checks; no implementation or runtime testing performed."
+  ],
+  "files_written": [
+    "output.md",
+    "execution-notes.json"
+  ]
+}

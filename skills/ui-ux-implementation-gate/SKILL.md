@@ -1,46 +1,18 @@
 ---
 name: ui-ux-implementation-gate
-description: Use immediately before implementing or modifying a user-facing UI to verify that design intent, information hierarchy, layout strategy, component constraints, states, and acceptance criteria are sufficient.
+description: Check whether unresolved UI decisions would prevent useful implementation of a substantial interface change.
 ---
 
-# UI/UX Implementation Gate
+# Implementation Readiness
 
-Check whether implementation can begin.
+Check the decisions that determine the change: core task, relevant information/actions, project/platform constraints, and success checks.
 
-Use this gate before creating a new user-facing page, substantial component, flow, dashboard, editor, landing page, onboarding sequence, or high-fidelity prototype.
+- Ready: implement.
+- Ready with assumptions: state consequential reversible assumptions and implement.
+- Needs a decision: identify the unresolved choice and its impact; continue independent work.
 
-## Checklist
+Missing template fields are not automatically blocking. A read-only report may have no CTA. Existing evidence can supply a layout and direction without new questions. Do not demand approval already provided.
 
-- Page role is clear.
-- Target user is clear.
-- Core task is clear.
-- First visual focus is clear.
-- P0/P1/P2 hierarchy is clear.
-- Main CTA is clear.
-- Layout model is clear.
-- Information density is clear.
-- Visual direction is clear.
-- Component system constraints are clear.
-- Required states are covered.
-- Responsive strategy is clear.
-- Acceptance criteria are clear.
+For substantial specs, [scripts/validate_ui_intent.py](../../scripts/validate_ui_intent.py) checks document completeness using the legacy full-spec format. Its score is not a UI quality score; its `blocked` status is a diagnostic, not an authorization decision. Resolve the script from this installed skill's location.
 
-## Output Contract
-
-```md
-## Implementation Gate
-
-Status: pass / pass-with-assumptions / blocked
-
-Known decisions:
-
-Assumptions:
-
-Blocking gaps:
-
-Implementation instructions:
-```
-
-If status is `blocked`, do not write high-fidelity UI. If the user explicitly asks to continue, switch to `pass-with-assumptions` and list the assumptions plainly.
-
-Use `references/design-quality-rubric.md`, `references/state-patterns.md`, and `references/component-patterns.md` to check whether the spec is implementation-ready.
+Use [references/design-quality-rubric.md](../../references/design-quality-rubric.md) and relevant [references/component-patterns.md](../../references/component-patterns.md).

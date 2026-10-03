@@ -1,0 +1,57 @@
+{
+  "id": "expressive-editorial",
+  "title": "Night market editorial direction",
+  "category": "direction",
+  "design_system": "Project-specific expressive editorial; Material expressiveness as contrast",
+  "source_urls": [
+    "https://m3.material.io/"
+  ],
+  "brief": "Propose two meaningfully different visual directions for an independent night-market magazine. Provide text specifications and a small original SVG concept for each; no application build.",
+  "context": "Brand direction is energetic and handmade: acid yellow #F4FF3A, black, large type, asymmetry and visible texture are welcome. Main task: discover this week’s feature, then find practical visiting information. Content: Lantern Makers After Dark; Friday 18:00–23:00; East Wharf; free entry. Both directions must preserve this information.",
+  "user_facts": {
+    "audience": "Local culture readers",
+    "preferred_style": "Expressive editorial, not a software dashboard",
+    "motion": "Optional; avoid making essential information depend on it"
+  },
+  "constraints": [
+    "Use original vector shapes and text, no copied photography or logos.",
+    "The two directions must differ in composition, not only colors.",
+    "Treat large type and asymmetry as permitted choices."
+  ],
+  "required_artifacts": [
+    "two direction specifications",
+    "two SVG concepts"
+  ],
+  "checks": [
+    {
+      "id": "brand-retained",
+      "kind": "style",
+      "criterion": "Both proposals use the requested expressive character and do not replace it with an unrelated restrained SaaS visual language.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "distinct-directions",
+      "kind": "heuristic",
+      "criterion": "The proposals differ in composition and reading sequence, with an explanation of the tradeoff.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "content-complete",
+      "kind": "hard",
+      "criterion": "Each SVG contains feature title, Friday hours, East Wharf and free entry as readable text.",
+      "evidence": "code",
+      "required": true
+    },
+    {
+      "id": "no-arbitrary-veto",
+      "kind": "process",
+      "criterion": "Does not reject asymmetry or large type merely because those features depart from Compass defaults.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "holdout",
+  "family": "editorial-expression"
+}

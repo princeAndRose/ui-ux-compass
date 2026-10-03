@@ -1,5 +1,7 @@
 # Component Patterns
 
+These are contextual examples and diagnostic hypotheses, not universal rules. Apply the selected platform, design system and task constraints first; verify an actual consequence before treating a visual choice as a defect. See [design-systems.md](design-systems.md) and [design-quality-rubric.md](design-quality-rubric.md).
+
 Use components as task primitives. A component choice should support the user's next action and the surface density.
 
 ## Data Table And Filters

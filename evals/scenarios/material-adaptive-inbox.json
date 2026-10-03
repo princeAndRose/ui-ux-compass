@@ -1,0 +1,58 @@
+{
+  "id": "material-adaptive-inbox",
+  "title": "Repair cooperative inbox",
+  "category": "implementation",
+  "design_system": "Material 3 adaptive list-detail",
+  "source_urls": [
+    "https://m3.material.io/foundations/layout/canonical-examples/overview"
+  ],
+  "brief": "Build a self-contained HTML repair-request inbox that adapts between desktop and mobile. Let staff read a request and mark it resolved.",
+  "context": "Three open requests: R17 Maya / bicycle brake cable; R18 Ivo / desk lamp switch; R19 Lin / kettle handle. Start in Open. At 1280x800 show list/detail; at 390x844 use one active content pane. Include Open and Resolved destinations.",
+  "user_facts": {
+    "storage": "Session memory only",
+    "primary_task": "Resolve a request after reading it",
+    "brand": "Friendly neighborhood repair cooperative"
+  },
+  "constraints": [
+    "Use Material adaptive layout ideas without requiring a framework installation.",
+    "Changing viewport must preserve request state.",
+    "Use text labels for destinations."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "wide and compact screenshots",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "resolution-consistent",
+      "kind": "hard",
+      "criterion": "Resolve R18: it leaves Open and appears in Resolved with the same requester and issue.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "responsive-state",
+      "kind": "hard",
+      "criterion": "Select R17 at wide width, switch to compact width, and still have a usable path to R17 and the other requests.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "navigation-feedback",
+      "kind": "heuristic",
+      "criterion": "The currently active destination and selected request are visually distinguishable.",
+      "evidence": "screenshot",
+      "required": true
+    },
+    {
+      "id": "task-priority",
+      "kind": "heuristic",
+      "criterion": "Request identity, issue and resolution action are grouped so the action scope is unambiguous.",
+      "evidence": "screenshot",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "adaptive-list-detail"
+}

@@ -1,31 +1,20 @@
 ---
 name: ui-ux-acceptance
-description: Use after implementing or revising UI to decide whether it satisfies the UI Intent Spec, acceptance criteria, visual direction, state coverage, accessibility expectations, and frontend maintainability requirements.
+description: Verify a completed UI change against the agreed task, design constraints, and acceptance checks.
 ---
 
 # UI/UX Acceptance
 
-Decide whether the UI is ready to accept, accept with notes, or revise.
+Verify the agreed change at the appropriate depth. Use the original request and confirmed decisions alongside implementation; a generated spec cannot silently redefine success.
 
-Compare the implemented UI against the UI Intent Spec, implementation gate, visual direction, review checklist, accessibility expectations, responsive strategy, and maintainability constraints.
+For each relevant check record `pass`, `fail`, `unverified`, or justified `not-applicable`, with evidence. Use actual interaction for functional claims, rendered screenshots for visual claims, and source inspection for implementation constraints. Accessibility automation is partial evidence, not proof of full accessibility.
 
-## Output Contract
+Report:
+- Accept: required checks are verified and pass.
+- Accept with notes: required checks pass; noncritical refinements remain explicit.
+- Revise: a required outcome fails.
+- Unverified: evidence needed for acceptance is missing.
 
-```md
-## UI Acceptance
+Compare expression with the selected system/brand, not a default preference for minimalism. A high visual score cannot compensate for a broken primary task.
 
-Decision: accept / accept-with-notes / revise
-
-Acceptance criteria:
-- [ ] ...
-- [ ] ...
-- [ ] ...
-
-Remaining issues:
-
-Recommended next action:
-```
-
-Do not accept a UI that lacks required states, contradicts the primary user task, hides P0 content, or violates stated constraints.
-
-Use `references/design-quality-rubric.md`, `references/state-patterns.md`, and `references/component-patterns.md` before accepting or requesting revisions.
+Use [references/design-quality-rubric.md](../../references/design-quality-rubric.md) and relevant [references/state-patterns.md](../../references/state-patterns.md). Persist sourced decisions and actual verification through `ui-ux-state`; report exactly what was tested.

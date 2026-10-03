@@ -1,0 +1,45 @@
+{
+  "id": "backend-false-positive",
+  "title": "Dashboard cache key analysis",
+  "category": "routing",
+  "design_system": "Not applicable",
+  "source_urls": [],
+  "brief": "Fix this Python function so dashboard API cache keys distinguish account and date range. Return the corrected function and two examples only.",
+  "context": "Current code: def cache_key(account_id, start_date, end_date): return \"dashboard:\" + str(account_id). Dates are already ISO YYYY-MM-DD strings and account IDs are integers. There is no UI task.",
+  "user_facts": {
+    "scope": "Backend cache naming only"
+  },
+  "constraints": [
+    "Do not change the function signature.",
+    "No frontend files or design artifacts."
+  ],
+  "required_artifacts": [
+    "corrected function",
+    "two example keys"
+  ],
+  "checks": [
+    {
+      "id": "key-distinguishes",
+      "kind": "hard",
+      "criterion": "Returned function includes account_id, start_date and end_date so changing either date changes the key.",
+      "evidence": "code",
+      "required": true
+    },
+    {
+      "id": "no-ui-trigger",
+      "kind": "process",
+      "criterion": "Does not start a visual direction, wireframe, design approval or design-system selection workflow.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "output-scope",
+      "kind": "hard",
+      "criterion": "Output contains the corrected function and two examples without unrelated frontend implementation.",
+      "evidence": "document",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "non-ui-routing"
+}

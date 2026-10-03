@@ -1,0 +1,58 @@
+{
+  "id": "carbon-operations-table",
+  "title": "Warehouse exception triage",
+  "category": "implementation",
+  "design_system": "Carbon-inspired dense operations",
+  "source_urls": [
+    "https://www.carbondesignsystem.com/building-blocks/core/components/data-table/guidelines"
+  ],
+  "brief": "Build a self-contained HTML operations table for dispatch exceptions, with status filtering, sortable age and batch assignment.",
+  "context": "Records: D31 overdue 48h unassigned; D32 waiting 12h unassigned; D33 overdue 24h Sam; D34 ready 2h unassigned; D35 overdue 72h unassigned; D36 waiting 6h Jo. Core task: compare exception age, select D31 and D35, assign both to Lee. Desktop viewport 1440x900; compact viewport 390x844.",
+  "user_facts": {
+    "audience": "Dispatch operators comparing many records",
+    "batch_scope": "Selected records only",
+    "density": "Compact and readable"
+  },
+  "constraints": [
+    "Preserve record comparison and identifiers.",
+    "For compact width, horizontal table scrolling is acceptable if controls remain reachable.",
+    "Do not add dashboard metrics or charts."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "desktop screenshot",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "sort-correct",
+      "kind": "hard",
+      "criterion": "Descending age yields D35, D31, D33, D32, D36, D34 when unfiltered.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "batch-scope",
+      "kind": "hard",
+      "criterion": "Selecting D31 and D35 then assigning Lee changes only those records and exposes the selected count before applying.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "filter-recovery",
+      "kind": "hard",
+      "criterion": "Selecting overdue leaves D31, D33 and D35; clearing the filter restores all six records.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "density-fit",
+      "kind": "style",
+      "criterion": "Age, status and assignee can be compared across all six rows at 1440x900 without opening separate detail cards.",
+      "evidence": "screenshot",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "dense-record-comparison"
+}

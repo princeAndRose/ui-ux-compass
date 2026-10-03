@@ -1,36 +1,14 @@
 ---
 name: ui-ux-wireframe
-description: Use before high-fidelity UI implementation when layout, information hierarchy, page regions, visual flow, or responsive structure should be validated without committing to colors and detailed styling.
+description: Explore uncertain UI structure or responsive behavior with a low-fidelity layout before detailed implementation.
 ---
 
 # UI/UX Wireframe
 
-Produce a low-fidelity layout before high-fidelity implementation when structure or hierarchy is still risky.
+Use when structure is uncertain or a wireframe is requested. A supplied layout or small edit does not need another wireframe.
 
-Do not focus on color, gradients, decoration, or fine styling. Focus on regions, hierarchy, flow, density, state placement, and responsive behavior.
+Choose a sketch, ASCII layout, or lightweight prototype suited to the decision. Show the main task, related content, action placement, and relevant narrow/wide or alternate-input behavior. Include recovery placement when it affects structure.
 
-## Required Output
+Explain tradeoffs and unresolved questions briefly. Do not prescribe a main CTA or strict P0/P1/P2 regions where peer exploration or read-only content is the purpose.
 
-- ASCII wireframe
-- Region descriptions
-- Visual flow
-- P0/P1/P2 mapping
-- Desktop layout
-- Mobile layout
-- Risks and open decisions
-
-## Example Shape
-
-```text
-+-------------------------------------------+
-| Header: title, context, primary action     |
-+-------------------------------------------+
-| P0 summary / main work area                |
-|                                           |
-+----------------------+--------------------+
-| P1 list / table      | P1 details/helper  |
-|                      |                    |
-+----------------------+--------------------+
-```
-
-Use `references/layout-patterns.md`, `references/layout-archetypes.md`, `references/state-patterns.md`, and `references/ui-intent-spec-template.md`.
+Consult [references/layout-archetypes.md](../../references/layout-archetypes.md) and [references/state-patterns.md](../../references/state-patterns.md) as needed. Follow the system and platform chosen in the brief.

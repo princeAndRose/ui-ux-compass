@@ -1,5 +1,7 @@
 # Feedback Translation Table
 
+These are contextual examples and diagnostic hypotheses, not universal rules. Apply the selected platform, design system and task constraints first; verify an actual consequence before treating a visual choice as a defect. See [design-systems.md](design-systems.md) and [design-quality-rubric.md](design-quality-rubric.md).
+
 Convert vague feedback into executable constraints. Ask for evidence only when the surface or task is unclear.
 
 | User wording | Likely meaning | Ask or inspect | Patch direction |

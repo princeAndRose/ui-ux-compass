@@ -1,49 +1,14 @@
 ---
 name: ui-ux-direction
-description: Use after UI intent is known but visual direction, layout model, density, hierarchy strategy, component style, or product feel still needs to be selected before generating UI.
+description: Explore or compare UI design directions when alternatives are requested or the visual and interaction approach remains unresolved.
 ---
 
 # UI/UX Direction
 
-Convert a UI Intent Spec into 2-3 strategic visual directions.
+Propose meaningfully different approaches to the same task. Explain tradeoffs in hierarchy, density, typography, interaction, and brand expression. Recommend one using project constraints.
 
-A direction is not a skin. It is a product strategy expressed through layout, density, hierarchy, typography, components, color, motion, and interaction emphasis.
+Honor a selected direction or system; do not reopen it merely because exploration is possible. The number and fidelity of alternatives depend on the request and cost of deciding. Use images, sketches, or a small prototype when they make differences more assessable than adjectives.
 
-## Output Contract
+For each alternative identify intended audience/task, emotional character, system/platform guidance and scope, structural/interaction differences, relevant states/input methods, and evidence that would favor or reject it.
 
-```md
-## Direction A: Efficient Tooling
-Best for:
-Layout:
-Density:
-Color:
-Typography:
-Components:
-Motion:
-Risk:
-
-## Direction B: Calm Personal Product
-Best for:
-Layout:
-Density:
-Color:
-Typography:
-Components:
-Motion:
-Risk:
-
-## Direction C: Branded Showcase
-Best for:
-Layout:
-Density:
-Color:
-Typography:
-Components:
-Motion:
-Risk:
-
-## Recommendation
-I recommend Direction <A/B/C> because...
-```
-
-Use `references/visual-vocabulary.md`, `references/layout-patterns.md`, `references/layout-archetypes.md`, `references/component-patterns.md`, and `references/design-quality-rubric.md` for consistent language.
+Read the relevant profile in [references/design-systems.md](../../references/design-systems.md). [references/visual-vocabulary.md](../../references/visual-vocabulary.md), [references/layout-patterns.md](../../references/layout-patterns.md), and [references/component-patterns.md](../../references/component-patterns.md) are optional aids. Evaluate using [references/design-quality-rubric.md](../../references/design-quality-rubric.md), not a universal aesthetic.

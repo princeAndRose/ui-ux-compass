@@ -1,0 +1,57 @@
+{
+  "id": "apple-library-detail",
+  "title": "Specimen library navigation",
+  "category": "implementation",
+  "design_system": "Apple HIG split-view inspired web",
+  "source_urls": [
+    "https://developer.apple.com/design/human-interface-guidelines/split-views"
+  ],
+  "brief": "Build a self-contained HTML prototype for a field specimen library. A user selects a specimen, reads its details, then returns to the list.",
+  "context": "Use original records: Fern / collected 14 May / North trail; Quartz / collected 16 May / Ridge; Lichen / collected 19 May / West grove. Start with no selection. Demonstrate at 1280x800 and 390x844. This is a web prototype inspired by split views, not a native Apple app.",
+  "user_facts": {
+    "primary_task": "Read and compare specimen notes",
+    "backend": "None; local sample data only"
+  },
+  "constraints": [
+    "At wide width show list and selected detail together.",
+    "At compact width provide a clear route from detail back to the list.",
+    "No external assets or network calls required."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "wide and compact screenshots",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "selection-linked",
+      "kind": "hard",
+      "criterion": "Selecting Quartz displays Quartz details and visually identifies Quartz as the selected list item.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "compact-return",
+      "kind": "hard",
+      "criterion": "At 390x844, select Lichen, return to the list, and select Fern without losing access to records.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "empty-selection",
+      "kind": "heuristic",
+      "criterion": "The initial detail area explains how to select a specimen instead of presenting a misleading missing-data error.",
+      "evidence": "screenshot",
+      "required": true
+    },
+    {
+      "id": "keyboard-access",
+      "kind": "hard",
+      "criterion": "All three records and the compact back control can be reached and activated using keyboard controls.",
+      "evidence": "interaction",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "adaptive-list-detail"
+}

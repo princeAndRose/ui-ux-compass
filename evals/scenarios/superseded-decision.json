@@ -1,0 +1,57 @@
+{
+  "id": "superseded-decision",
+  "title": "Resume after a direction change",
+  "category": "state-recovery",
+  "design_system": "Current project contract overrides old inspiration",
+  "source_urls": [
+    "https://www.carbondesignsystem.com/building-blocks/core/components/data-table/guidelines"
+  ],
+  "brief": "Resume the shipment page plan using my latest decision: this is now a compact desktop exception table. Update the plan and record which previous decisions are superseded. Do not implement yet.",
+  "context": "Earlier decision log: 2026-09-28, public marketing page, spacious cards, goal explain shipping benefits, source user-confirmed. Latest user decision: 2026-10-02, internal dispatch operators, compare overdue shipments across rows, show ID/age/owner/status, desktop 1440px first, compact density. Marketing landing page remains a separate surface and keeps its existing brand direction.",
+  "user_facts": {
+    "current_surface": "Internal shipment exceptions",
+    "old_surface": "Public shipping marketing page",
+    "priority": "Compare overdue shipments and assign owners"
+  },
+  "constraints": [
+    "Apply the new decision to shipment exceptions only.",
+    "Retain the separate marketing page direction.",
+    "A table plan is sufficient; no build or reapproval required."
+  ],
+  "required_artifacts": [
+    "updated page plan",
+    "scoped decision update"
+  ],
+  "checks": [
+    {
+      "id": "current-intent",
+      "kind": "hard",
+      "criterion": "Plan prioritizes overdue-record comparison and owner assignment with ID/age/owner/status columns.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "supersession-scoped",
+      "kind": "hard",
+      "criterion": "Identifies spacious card/marketing-goal decisions as superseded for exceptions while retaining them for the separate marketing surface.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "density-context",
+      "kind": "heuristic",
+      "criterion": "Explains compact density in terms of operator comparison rather than treating it as an aesthetic defect.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "no-repeat-decision",
+      "kind": "process",
+      "criterion": "Does not ask the user to choose again between the old cards and the explicitly selected table.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "holdout",
+  "family": "decision-supersession"
+}

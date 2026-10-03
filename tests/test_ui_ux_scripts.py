@@ -593,7 +593,7 @@ class StateScriptTests(unittest.TestCase):
 
         self.assertEqual(state["version"], 2)
         self.assertEqual(state["project"]["facts"]["summary"], "Old project")
-        self.assertEqual(state["user_preferences"]["confirmed"]["density_default"], "low")
+        self.assertEqual(state["user_preferences"]["assumptions"]["density_default"], "low")
         self.assertEqual(state["design_system"]["facts"]["framework"], "react")
 
 

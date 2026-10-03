@@ -1,0 +1,59 @@
+{
+  "id": "govuk-service-review",
+  "title": "Community garden plot application",
+  "category": "implementation",
+  "design_system": "GOV.UK service-pattern inspired web",
+  "source_urls": [
+    "https://design-system.service.gov.uk/patterns/validation/",
+    "https://design-system.service.gov.uk/patterns/check-answers/"
+  ],
+  "brief": "Build an original self-contained HTML application flow for a community garden plot: enter details, review answers, submit and confirm.",
+  "context": "Required: full name and email. Optional: preferred plot name. Accept names such as Jo O’Neill. Show validation errors on Continue. The review page allows changing each answer and returning directly to review. This is a fictional cooperative service, not a government service.",
+  "user_facts": {
+    "confirmation_reference": "GARDEN-204",
+    "eligibility": "No eligibility checks in this prototype",
+    "submission": "Local simulation"
+  },
+  "constraints": [
+    "Do not use GOV.UK branding, crown imagery or official-service claims.",
+    "Missing optional plot preference must not block submission.",
+    "Keep entered values through correction."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "error and review screenshots",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "summary-navigation",
+      "kind": "hard",
+      "criterion": "Submitting empty required fields moves focus to an error summary with links that focus the corresponding inputs.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "review-correct",
+      "kind": "hard",
+      "criterion": "Enter Jo O’Neill and jo@example.test, continue, change only the email, and return directly to review with name retained.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "optional-clear",
+      "kind": "heuristic",
+      "criterion": "The review page makes the unanswered optional preference understandable without implying an error.",
+      "evidence": "screenshot",
+      "required": true
+    },
+    {
+      "id": "confirmation-after-submit",
+      "kind": "hard",
+      "criterion": "GARDEN-204 confirmation appears only after an explicit final submission from review.",
+      "evidence": "interaction",
+      "required": true
+    }
+  ],
+  "split": "holdout",
+  "family": "service-check-answers"
+}

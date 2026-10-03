@@ -25,9 +25,16 @@ def _list(values: list[Any]) -> str:
     lines = []
     for value in values:
         if isinstance(value, dict):
+            if "text" not in value:
+                lines.append(f"- {json.dumps(value, ensure_ascii=False)}")
+                continue
             source = value.get("source", "unknown")
             text = value.get("text", "")
             lines.append(f"- [{source}] {text}")
+            for key in ("scope", "evidence", "revisit_when", "status"):
+                if key in value:
+                    rendered = json.dumps(value[key], ensure_ascii=False) if isinstance(value[key], (dict, list)) else value[key]
+                    lines.append(f"  - {key}: {rendered}")
         else:
             lines.append(f"- {value}")
     return "\n".join(lines)
@@ -46,12 +53,6 @@ def _dict_lines(values: dict[str, Any]) -> list[str]:
     return lines or ["- None"]
 
 
-def _merged_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
-    merged = dict(preferences.get("defaults", {}))
-    merged.update(preferences.get("confirmed", {}))
-    return merged
-
-
 def render_state(state: dict[str, Any]) -> str:
     state = migrate_state(state)
     project = state.get("project", {})
@@ -61,7 +62,6 @@ def render_state(state: dict[str, Any]) -> str:
     preferences = state.get("user_preferences", {})
     confirmed_preferences = preferences.get("confirmed", {})
     assumed_preferences = preferences.get("assumptions", {})
-    preference_view = _merged_preferences(preferences)
     design_system = state.get("design_system", {})
     design_facts = design_system.get("facts", {})
     design_confirmed = design_system.get("confirmed", {})
@@ -84,8 +84,7 @@ def render_state(state: dict[str, Any]) -> str:
         *_dict_lines(confirmed_preferences),
         "",
         "Preference defaults:",
-        f"- Density default: {preference_view.get('density_default', 'medium')}",
-        f"- Visual tone: {', '.join(preference_view.get('visual_tone', [])) or 'Unknown'}",
+        *_dict_lines(preferences.get("defaults", {})),
         "",
         "Preference assumptions:",
         *_dict_lines(assumed_preferences),
@@ -111,7 +110,11 @@ def render_state(state: dict[str, Any]) -> str:
             f"  - Role: {page.get('page_role', '') or page.get('role', '') or 'Unknown'}",
             f"  - Target user: {page.get('target_user', '') or 'Unknown'}",
             f"  - Core task: {page.get('core_task', '') or 'Unknown'}",
-            "  - Confirmed decisions:",
+            f"  - Design profile: {page.get('design_system_profile') or 'Unspecified'}",
+            f"  - Platform: {page.get('platform') or 'Unspecified'}",
+            "  - Design sources:",
+            "\n".join(f"    {line}" for line in _list(page.get("design_sources", [])).splitlines()),
+            "  - Decisions (source labeled):",
             "\n".join(f"    {line}" for line in _list(page.get("decisions", [])).splitlines()),
             "  - Agent assumptions:",
             "\n".join(f"    {line}" for line in _list(page.get("assumptions", [])).splitlines()),

@@ -1,53 +1,28 @@
-# UI Review Checklist
+# UI review checklist
 
-## Information Hierarchy
+Select relevant checks from the original task before reviewing. Record platform/system, viewport, data, interaction state, and evidence available. Missing evidence remains unverified.
 
-- Is P0 visually dominant?
-- Are P1 and P2 clearly secondary?
-- Is anything competing with the primary task?
-- Does the layout defer low-value content?
+## Task and information
+- Is the intended task or exploration path apparent?
+- Are relevant actions and information reachable in the tested context?
+- Is grouping understandable and priority appropriate, including equal-priority content?
 
-## Visual Focus
+## Interaction
+- Do controls do what their labels and states imply?
+- Is feedback perceptible after an action?
+- Are required empty, loading, failure, selection, and recovery states covered?
+- Does recovery preserve user work where the task requires it?
 
-- What does the user see first?
-- Is that the right thing?
-- Does the primary CTA support the first visual focus?
+## Adaptation and accessibility
+- Does relevant narrow/wide behavior preserve context and task access?
+- Are keyboard navigation, focus, labels, and error associations usable?
+- Have contrast and other measurable requirements been tested, not guessed?
+- Are longer content and relevant input methods accounted for?
 
-## Layout Rhythm
+## Design-system and style fit
+- Does the result follow the selected profile/platform and project components?
+- Are departures intentional and justified by the brief?
+- Do typography, spacing, motion, and decoration form a coherent expression?
+- Is a critique about task harm, a system mismatch, or merely personal taste?
 
-- Are sections separated clearly?
-- Is spacing consistent?
-- Are groups internally tight and externally breathable?
-- Does the mobile layout preserve the task order?
-
-## Components
-
-- Are component variants consistent?
-- Are buttons overused?
-- Are secondary actions properly muted?
-- Are tables, forms, cards, and panels using the same density logic?
-
-## Product Realism
-
-- Loading state
-- Empty state
-- Error state
-- Disabled state
-- Selected state
-- Hover and focus state
-- Realistic data shape
-
-## Accessibility
-
-- Keyboard focus
-- Contrast
-- Semantic structure
-- Form labels
-- Error messages
-- Responsive behavior
-
-## Over-Decoration
-
-- Do decorative elements clarify the task?
-- Are shadows, gradients, borders, and motion used with restraint?
-- Does any visual effect compete with P0 content?
+Use [design-quality-rubric.md](design-quality-rubric.md) for evidence and ratings. Do not require issues in every category. A code-only review cannot verify rendered hierarchy or successful interaction.

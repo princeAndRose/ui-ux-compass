@@ -1,0 +1,9 @@
+# Independent artifact judge
+
+Inputs: original public brief and constraints, predefined product checks, anonymous artifacts and evidence captured at the specified states/viewports. Do not request condition, plugin identity, author explanations, intent-spec self-grades or process judge scores. If these leak into the packet, flag the leak to the coordinator before comparison.
+
+Evaluate whether a user can complete the requested task and whether the visual approach fits its context. Use the referenced design system only where the task makes it applicable; do not mechanically blend Apple, Material, Carbon or other conventions. Do not reward minimalism, decoration, gradients, a specific typeface or extensive prose by default.
+
+For each hard/heuristic/style check, independently record `check_id`, `status`, `score`, `reason`, and `evidence`. Use pass/fail only when the supplied evidence supports the predeclared criterion. Use integer 0–3 scores for heuristic/style only; hard scores are null. Each evidence item needs its expected type, relative saved path and a concrete locator (state/step, screen region, trace event or code line). Do not invent files or use the producer's assertion as proof. Use document evidence for criteria about the contents of a requested specification, plan or review, citing its section or line. A document cannot prove runtime behavior or process, even when it asserts successful testing. Missing required state, unavailable UI, unknown behavior or inadequate evidence means unverified. Required checks cannot be not_applicable.
+
+Use the protocol's anchors and any frozen scenario-specific anchors. Distinguish a failure from merely preferring another valid treatment. Name the affected user task and observable consequence. Save independent grades before discussing disagreements with another judge. Report meaningful uncertainties and conflicting evidence for human review.

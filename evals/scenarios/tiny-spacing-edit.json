@@ -1,0 +1,38 @@
+{
+  "id": "tiny-spacing-edit",
+  "title": "Adjust existing toolbar gap",
+  "category": "targeted-edit",
+  "design_system": "Existing project tokens",
+  "source_urls": [],
+  "brief": "Change only the toolbar button gap from 8px to 12px. Return the corrected snippet.",
+  "context": "Provided complete CSS: .toolbar { display: flex; align-items: center; gap: 8px; padding: 16px; } .toolbar button { min-height: 40px; } The user has already checked the target spacing in the project. No broader restyle is requested.",
+  "user_facts": {
+    "target_gap": "12px",
+    "scope": "This snippet only"
+  },
+  "constraints": [
+    "Keep all other CSS declarations unchanged.",
+    "No browser build is needed for this literal edit."
+  ],
+  "required_artifacts": [
+    "corrected CSS snippet"
+  ],
+  "checks": [
+    {
+      "id": "exact-edit",
+      "kind": "hard",
+      "criterion": "Changes gap to 12px while preserving display, alignment, padding and button min-height.",
+      "evidence": "code",
+      "required": true
+    },
+    {
+      "id": "no-blocking-interview",
+      "kind": "process",
+      "criterion": "Does not require design direction, audience or aesthetic preference answers before returning the snippet.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "literal-scoped-edit"
+}

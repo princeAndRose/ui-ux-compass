@@ -1,72 +1,32 @@
 ---
 name: ui-ux-compass-router
-description: Use at the start of any Codex conversation to decide whether UI/UX Compass applies, and whenever work may affect user-facing UI, frontend components, layouts, styling, routes, product flows, prototypes, visual design, UX copy, or UI review. This skill routes only; it must not start a full interview unless risk warrants it.
+description: Choose the minimum useful design workflow when a UI task has unresolved intent, design choices, or review needs. Skip backend work and routine edits with clear requirements.
 ---
 
-# UI/UX Compass Router
+# UI/UX Compass
 
-Act as the routing layer for UI/UX Compass.
+Help the user reach a fitting, usable interface with as little process as the task needs.
 
-Do not design immediately. Decide whether the task is entering UI/UX territory, how risky the UI decision is, and which UI/UX Compass skill should be used next.
+## Decide what is missing
 
-Core principle: default to assist, not interrupt.
+Use the request, existing decisions, relevant UI files, and supplied visual evidence. Distinguish impact from uncertainty: a large page with an approved design can proceed; a small interaction with unclear consequences may need clarification.
 
-Do not ask UX questions for backend-only, infra-only, test-only, dependency-only, or trivial copy changes unless they affect user-facing behavior or interaction meaning.
+- Clear local edit: implement using existing conventions, without an interview.
+- Clear new surface: capture only useful intent and acceptance checks, then implement.
+- Material unknown that changes the solution: ask the highest-value question with a recommendation where useful. Continue independent work.
+- Reversible uncertainty or a request to proceed: state a brief assumption and continue within scope.
+- Subjective dissatisfaction: inspect the interface and use `ui-ux-review`; do not restart discovery by default.
+- Competing directions requested or genuinely unresolved: use `ui-ux-direction`.
+- Before handoff: verify agreed outcomes using `ui-ux-acceptance` at a depth proportional to the change.
 
-## Routing Steps
+Risk 0–4 from the detector describes an initial impact hint, not a mandatory sequence or question quota. If useful, run [scripts/detect_ui_surface.py](../../scripts/detect_ui_surface.py) with an absolute installed-plugin path and the actual target repository. See [references/router-execution.md](../../references/router-execution.md) for invocation and evidence handling. Skip it for obvious non-UI work.
 
-1. Determine whether the task affects a user-facing interface.
-2. If local shell access is available and the task is not obviously backend-only, infra-only, test-only, dependency-only, or documentation-only, run detector evidence:
+## Preserve the project's design language
 
-```bash
-python3 scripts/detect_ui_surface.py --repo-root . --message "<user request>" --json
-```
+Honor the user's selected system, platform, brand, and existing components. For a new choice or conflict, consult only the relevant profile in [references/design-systems.md](../../references/design-systems.md). Keep platform conventions, broadly useful principles, and aesthetic preferences distinct. No universal ban on fonts, color, gradients, shadows, or density.
 
-Use `python` instead of `python3` when that is the local Python command. Treat the detector output as evidence, not the sole source of truth.
+[references/surface-playbooks.md](../../references/surface-playbooks.md) suggests patterns, not requirements. Shared state belongs to `ui-ux-state`; never treat a previous assumption as confirmed.
 
-3. Inspect likely UI files, routes, components, styling, and design tokens before asking the user.
-4. Combine model judgment, detector evidence, repo evidence, and prior conversation.
-5. Classify UI/UX risk from 0 to 4.
-6. Choose the minimum useful intervention.
-7. If implementation is safe, continue with explicit assumptions.
-8. If implementation is risky, route to the appropriate UI/UX Compass skill.
+## Resource paths
 
-Do not run the detector when the task is obviously non-UI, such as pure API tests, backend retries, database migrations, dependency updates, CI config, or internal refactors with no user-facing behavior change.
-
-## Risk Levels
-
-Risk 0: no user-facing UI impact. Do not intervene.
-
-Risk 1: trivial or local UI change within an existing pattern. Proceed silently using project conventions.
-
-Risk 2: local component or existing page improvement with limited ambiguity. Ask at most one high-leverage question, or proceed with clearly stated assumptions.
-
-Risk 3: new page, new flow, new dashboard, new editor, new form flow, or substantial layout change. Route to `ui-ux-capture-intent` or `ui-ux-brief`; produce a UI Intent Spec before implementation.
-
-Risk 4: core product surface, high-fidelity prototype, landing page, onboarding flow, pricing page, complex dashboard, or subjective UI dissatisfaction. Use the full flow: brief, direction, wireframe, implementation gate, review, acceptance.
-
-## Intervention Modes
-
-- `observe`
-- `apply-existing-conventions`
-- `ask-one-question`
-- `assumptions-gate`
-- `mini-brief`
-- `full-brief`
-- `visual-direction`
-- `review`
-- `acceptance`
-
-## Hard Rules
-
-- Never start high-fidelity UI implementation when page role, primary user task, information hierarchy, main CTA, and layout archetype are all unknown.
-- Never ask vague aesthetic questions such as "what style do you like?"
-- Ask one question at a time when interviewing.
-- Every question must include options and a recommendation.
-- Prefer extracting answers from existing code, screenshots, docs, routes, components, and prior conversation before asking the user.
-- If the user asks to move fast, reduce questions but still produce explicit assumptions.
-- If the user says not to ask questions, proceed with assumptions and mark them as assumptions.
-
-## Useful References
-
-Read `references/router-execution.md` for evidence handling, `references/routing-matrix.md` for risk details, `references/prompt-contracts.md` for output contracts, and `references/examples.md` for common routing examples.
+Shared resources are relative to this installed skill: `../../scripts/` and `../../references/`. Resolve them from this file's location, not the user's project. Project arguments point to the user's checkout. Missing shell/browser/hooks reduce available evidence; report the limit and continue supported work.

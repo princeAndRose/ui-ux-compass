@@ -1,7 +1,7 @@
 {
   "name": "ui-ux-compass",
-  "version": "0.1.0",
-  "description": "Routes frontend coding conversations through UI/UX intent capture, risk-based clarification, implementation gates, review, and acceptance.",
+  "version": "0.2.0",
+  "description": "Context-aware UI design guidance, design-system selection, evidence-based review, and controlled evaluation.",
   "author": {
     "name": "UI/UX Compass Contributors"
   },
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "UI/UX Compass",
     "shortDescription": "Design-intent routing for frontend UI work",
-    "longDescription": "Detects when coding work enters UI/UX territory, captures design intent, asks the minimum useful questions, and gates implementation with UI specs and review checklists.",
+    "longDescription": "Preserves project intent and design-system choices, asks only consequential questions, and reviews interfaces using explicit evidence and task-specific criteria.",
     "developerName": "UI/UX Compass Contributors",
     "category": "Productivity",
     "capabilities": [
@@ -35,5 +35,6 @@
     "brandColor": "#4F46E5",
     "composerIcon": "./assets/icon.svg",
     "logo": "./assets/logo.svg"
-  }
+  },
+  "hooks": "./hooks/hooks.json"
 }

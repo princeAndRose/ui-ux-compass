@@ -1,67 +1,17 @@
-# UI Intent Spec Template
+# UI intent record
 
-Use this template before implementing a new user-facing page, flow, dashboard, editor, onboarding sequence, landing page, or substantial UI surface.
+Use a compact record for decisions that matter to implementation. Existing approved designs can supply these decisions. Small edits do not require a full document.
 
-```md
-# UI Intent Spec: <page or surface>
+- **Task and audience:** What should the user accomplish or understand?
+- **Surface and platform:** Which page/flow, devices, and inputs are in scope?
+- **Design system and brand:** Chosen profile/version, project components, reference sources, intentional departures.
+- **Content and actions:** Priorities, peer content, navigation, and primary action if applicable.
+- **Structure and expression:** Layout, density, typography, color, motion, tone as needed.
+- **Relevant states:** Loading, empty, failure/recovery, selection, validation, or explicit inapplicability.
+- **Constraints:** Existing implementation and user choices to preserve.
+- **Acceptance:** Observable checks and evidence required.
+- **Decision provenance:** Confirmed / project fact / assumption; scope, source, and revisit condition.
 
-## Summary
+Omit inapplicable sections. Missing optional fields do not block implementation. Mark unknowns and assumptions honestly.
 
-## Page Role
-
-## Target User
-
-## Core User Task
-
-## First Visual Focus
-
-## Information Hierarchy
-P0:
-P1:
-P2:
-Deferred:
-
-## Primary Action
-
-## Secondary Actions
-
-## User Flow
-Entry:
-Decision:
-Action:
-Feedback:
-Exception:
-
-## Layout Strategy
-
-## Visual Direction
-Density:
-Tone:
-Structure:
-Color:
-Typography:
-Components:
-Motion:
-
-## States
-Loading:
-Empty:
-Error:
-Disabled:
-Selected:
-Success:
-
-## Responsive Strategy
-
-## Accessibility Notes
-
-## Implementation Constraints
-
-## Anti-goals
-
-## Acceptance Criteria
-
-## Open Questions
-```
-
-Write unknowns explicitly. Do not silently convert unknowns into confirmed design decisions.
+The existing JSON validator accepts the legacy full-spec field names (page_role, target_user, core_task, information_hierarchy, etc.). It measures document readiness only; it does not evaluate rendered UI quality or user authorization.

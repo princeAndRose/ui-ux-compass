@@ -1,0 +1,44 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ui-ux-compass",
+  "version": "0.2.0",
+  "description": "Context-aware UI design guidance, design-system selection, evidence-based review, and controlled evaluation.",
+  "author": {
+    "name": "UI/UX Compass Contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "frontend",
+    "ui",
+    "ux",
+    "design",
+    "product-design",
+    "prototype",
+    "workflow",
+    "codex"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "UI/UX Compass",
+        "shortDescription": "Design-intent routing for frontend UI work",
+        "longDescription": "Preserves project intent and design-system choices, asks only consequential questions, and reviews interfaces using explicit evidence and task-specific criteria.",
+        "developerName": "UI/UX Compass Contributors",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "defaultPrompt": [
+          "Use UI/UX Compass before adding a dashboard page.",
+          "Use UI/UX Compass to review why this UI feels wrong.",
+          "Use UI/UX Compass before implementing a user-facing flow."
+        ],
+        "brandColor": "#4F46E5",
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/logo.svg"
+      },
+      "hooks": "./hooks/hooks.json"
+    }
+  }
+}

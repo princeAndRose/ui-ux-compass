@@ -1,0 +1,56 @@
+{
+  "id": "clear-supplied-design",
+  "title": "Implement approved event card",
+  "category": "implementation",
+  "design_system": "Explicit project design contract",
+  "source_urls": [],
+  "brief": "Implement this already-approved event card as a standalone HTML file. The design decisions below are final.",
+  "context": "White background, #18212B text, #0B5D4B primary button, 16px system body text, 24px title, 24px card padding, 12px corner radius. Order: category Community; title Repair Together; date Saturday 10:00–14:00; location South Workshop; primary button Reserve a place. Card max width 480px, fluid below that with 16px page padding. Button opens an inline confirmation reading Place reserved. No images.",
+  "user_facts": {
+    "audience": "Community participants",
+    "design_status": "Approved",
+    "reservation": "Local simulation"
+  },
+  "constraints": [
+    "Implement the supplied order, copy and tokens.",
+    "At 390px wide, all card content remains within the page.",
+    "No direction exploration is needed."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "390px screenshot",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "contract-tokens",
+      "kind": "hard",
+      "criterion": "Implements all specified colors, type sizes, padding, radius and maximum width.",
+      "evidence": "code",
+      "required": true
+    },
+    {
+      "id": "content-order",
+      "kind": "hard",
+      "criterion": "Category, title, date, location and button appear in the specified order.",
+      "evidence": "screenshot",
+      "required": true
+    },
+    {
+      "id": "reserve-action",
+      "kind": "hard",
+      "criterion": "Reserve a place reveals Place reserved without navigating to a missing page.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "no-reconfirmation",
+      "kind": "process",
+      "criterion": "Does not ask the user to reselect colors, audience, layout or design direction already supplied.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "approved-contract"
+}

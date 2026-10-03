@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python ${PLUGIN_ROOT}/hooks/session_start.py",
-            "statusMessage": "Loading UI/UX Compass context"
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/session_start.py\"",
+            "statusMessage": "Initializing optional UI/UX Compass cache"
           }
         ]
       }

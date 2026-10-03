@@ -20,22 +20,16 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution
 SOURCE_TYPES = {"user-confirmed", "project-fact", "agent-assumption"}
 
 PROJECT_FIELDS = {"name", "summary", "product_type", "target_users", "primary_use_cases", "anti_goals"}
-DESIGN_SYSTEM_FIELDS = {"framework", "router", "styling", "ui_library", "tokens", "component_dirs", "notes"}
+DESIGN_SYSTEM_FIELDS = {"framework", "router", "styling", "ui_library", "tokens", "component_dirs", "notes", "profile", "platform", "sources"}
 SOURCE_SECTION_KEYS = {"facts", "confirmed", "assumptions", "defaults"}
 
 DEFAULT_USER_PREFERENCES = {
-    "density_default": "medium",
-    "visual_tone": ["restrained", "clear", "product-like"],
+    "density_default": "",
+    "visual_tone": [],
     "layout_preferences": [],
     "color_preferences": [],
     "component_preferences": [],
-    "anti_patterns": [
-        "generic SaaS landing page",
-        "overused gradients",
-        "heavy shadows",
-        "meaningless illustrations",
-        "equal-weight cards everywhere",
-    ],
+    "anti_patterns": [],
 }
 
 
@@ -53,6 +47,9 @@ def default_page() -> dict[str, Any]:
         "user_flow": {"entry": "", "decision": "", "action": "", "feedback": "", "error_path": ""},
         "layout_strategy": "",
         "visual_direction": "",
+        "design_system_profile": "",
+        "platform": "",
+        "design_sources": [],
         "interaction_states": [],
         "responsive_strategy": "",
         "accessibility_notes": [],
@@ -95,6 +92,9 @@ def default_state(project_name: str = "") -> dict[str, Any]:
                 "tokens": [],
                 "component_dirs": [],
                 "notes": [],
+                "profile": "",
+                "platform": "",
+                "sources": [],
             },
             "confirmed": {},
             "assumptions": {},
@@ -158,7 +158,8 @@ def migrate_state(payload: dict[str, Any], project_name: str = "") -> dict[str, 
     if isinstance(preferences, dict) and any(key in preferences for key in SOURCE_SECTION_KEYS):
         migrated["user_preferences"] = _deep_merge(migrated["user_preferences"], preferences)
     elif isinstance(preferences, dict):
-        migrated["user_preferences"]["confirmed"] = _legacy_values(preferences, set(DEFAULT_USER_PREFERENCES))
+        # v1 also stored plugin defaults here; there is no evidence of user consent.
+        migrated["user_preferences"]["assumptions"] = _legacy_values(preferences, set(DEFAULT_USER_PREFERENCES))
 
     migrated["design_system"] = _deep_merge(
         migrated["design_system"],
@@ -171,16 +172,21 @@ def migrate_state(payload: dict[str, Any], project_name: str = "") -> dict[str, 
     return migrated
 
 
-def _append_sourced(items: list[Any], source: str, target: list[dict[str, str]]) -> None:
+def _append_sourced(items: list[Any], source: str, target: list[dict[str, Any]]) -> None:
+    if not isinstance(items, list):
+        raise ValueError("decisions and assumptions must be arrays")
     for item in items:
+        metadata = {}
         if isinstance(item, dict):
             text = str(item.get("text", "")).strip()
-            item_source = str(item.get("source", source)).strip() or source
+            # Item-controlled labels cannot override the patch's provenance.
+            if item.get("source", source) != source:
+                raise ValueError(f"decision source must match its destination source: {source}")
+            metadata = {key: deepcopy(item[key]) for key in ("scope", "evidence", "revisit_when", "status") if key in item}
         else:
             text = str(item).strip()
-            item_source = source
         if text:
-            entry = {"source": item_source, "text": text}
+            entry = {"source": source, "text": text, **metadata}
             if entry not in target:
                 target.append(entry)
 
@@ -246,7 +252,7 @@ def _merge_source_aware_section(section: dict[str, Any], patch_section: dict[str
     return merged
 
 
-def _append_assumed_fields(page_patch: dict[str, Any], source: str, assumptions: list[dict[str, str]]) -> None:
+def _append_assumed_fields(page_patch: dict[str, Any], source: str, assumptions: list[dict[str, Any]]) -> None:
     for key, value in page_patch.items():
         if key in {"decisions", "assumptions", "id", "page_id", "source"}:
             continue

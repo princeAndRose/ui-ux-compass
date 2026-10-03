@@ -1,132 +1,18 @@
-# Prompt Contracts
+# Compact output contracts
 
-Use these output contracts to keep UI/UX Compass interventions concrete.
+Adapt the amount of output to the user request. Do not produce every section for every task.
 
-## One-question UI Gate
+## Consequential question
+Decision needed; why its answer changes the result; useful options and recommendation, or a direct factual question.
 
-```md
-## One-question UI gate
+## Proceed with assumptions
+State the material reversible assumption and proceed within the authorized scope. Silence does not confirm a preference or authorize an external action.
 
-Question:
+## Intent
+See [ui-intent-spec-template.md](ui-intent-spec-template.md). Reuse supplied decisions rather than re-interviewing.
 
-Why this matters:
+## Review
+For each actual finding: problem, evidence, impact, focused fix, and verification check. Separate observed defects from unverified hypotheses. Zero findings is valid.
 
-Options:
-A.
-B.
-C.
-
-Recommendation:
-
-Reply format:
-Choose A/B/C, say "use recommendation", or override with your own answer.
-```
-
-## Assumptions Gate
-
-```md
-## Assumptions Gate
-
-I will proceed with these assumptions:
-
-1. Page role:
-2. Core task:
-3. First visual focus:
-4. Information density:
-5. Visual direction:
-
-These are assumptions, not confirmed requirements. If you do not object, I will implement in this direction.
-```
-
-## UI Intent Spec
-
-```md
-# UI Intent Spec: <page/surface>
-
-## Summary
-
-## Page role
-
-## Target user
-
-## Core task
-
-## First visual focus
-
-## Information hierarchy
-P0:
-P1:
-P2:
-Deferred:
-
-## Primary action
-
-## Secondary actions
-
-## User flow
-Entry:
-Decision:
-Action:
-Feedback:
-Exception:
-
-## Layout strategy
-
-## Visual direction
-Density:
-Tone:
-Structure:
-Color:
-Typography:
-Components:
-Motion:
-
-## States
-Loading:
-Empty:
-Error:
-Disabled:
-Selected:
-Success:
-
-## Responsive strategy
-
-## Accessibility notes
-
-## Implementation constraints
-
-## Anti-goals
-
-## Acceptance criteria
-
-## Open questions
-```
-
-## UI Review
-
-```md
-# UI Review
-
-## Overall diagnosis
-
-## Top issues
-
-### 1. <issue>
-Evidence:
-Impact:
-Fix:
-
-### 2. <issue>
-Evidence:
-Impact:
-Fix:
-
-## Priority patch list
-P0:
-P1:
-P2:
-
-## Revised implementation instructions
-
-## Acceptance checklist
-```
+## Acceptance
+Required checks with pass/fail/unverified/not-applicable and evidence. Overall accept / accept-with-notes / revise / unverified. Describe verification limits without implying a complete evaluation from a spec or source-only inspection.

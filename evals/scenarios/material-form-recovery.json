@@ -1,0 +1,58 @@
+{
+  "id": "material-form-recovery",
+  "title": "Workshop reservation errors",
+  "category": "implementation",
+  "design_system": "Material 3 input-state inspired web",
+  "source_urls": [
+    "https://developer.android.com/develop/ui/compose/quick-guides/content/validate-input?hl=en"
+  ],
+  "brief": "Build a self-contained HTML workshop reservation form with recoverable validation and a simulated submission failure.",
+  "context": "Fields: name, email and seats (integer 1–4). Keep labels visible. A valid first submission fails with a simulated connection error; retry succeeds. For this product, validate when Submit is pressed, not on each keystroke. Use original friendly community-workshop styling.",
+  "user_facts": {
+    "success_message": "Reservation received",
+    "validation_timing": "Submit only",
+    "network": "Simulated locally; no real reservations"
+  },
+  "constraints": [
+    "Preserve entered values after validation and simulated connection failures.",
+    "Do not claim Android or Material certification.",
+    "No backend or payment needed."
+  ],
+  "required_artifacts": [
+    "index.html",
+    "invalid and success screenshots",
+    "interaction evidence"
+  ],
+  "checks": [
+    {
+      "id": "field-correction",
+      "kind": "hard",
+      "criterion": "Submitting email wrong and seats 0 identifies both affected fields and explains accepted input.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "retain-input",
+      "kind": "hard",
+      "criterion": "After correcting email to ada@example.test and seats to 2, the first valid submit fails without clearing name/email/seats; retry succeeds.",
+      "evidence": "interaction",
+      "required": true
+    },
+    {
+      "id": "errors-associated",
+      "kind": "hard",
+      "criterion": "Email and seats have persistent associated labels and programmatically associated error descriptions.",
+      "evidence": "code",
+      "required": true
+    },
+    {
+      "id": "timing-priority",
+      "kind": "process",
+      "criterion": "Follows the requested submit-only validation timing even though a linked Android example demonstrates validation while typing.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "holdout",
+  "family": "form-error-recovery"
+}

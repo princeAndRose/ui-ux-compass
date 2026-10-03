@@ -1,0 +1,56 @@
+{
+  "id": "apple-settings-plan",
+  "title": "Focus journal settings",
+  "category": "planning",
+  "design_system": "Apple HIG-inspired macOS",
+  "source_urls": [
+    "https://developer.apple.com/design/human-interface-guidelines/settings"
+  ],
+  "brief": "Propose the settings structure for a macOS focus journal. Deliver a short interaction specification, not code.",
+  "context": "Users write daily notes. Available options: default reminder time, weekly summary on/off, follow system appearance, current-note sort order, and export current note. The app has no settings screen yet. Existing primary navigation is Journal and History. Reminders are off until explicitly enabled; selecting a default time alone must not enable delivery. OS notification authorization is unknown.",
+  "user_facts": {
+    "audience": "Individuals writing a daily journal",
+    "reminder_default": "Off until the user enables reminders",
+    "persistence": "Reminder and summary preferences persist across launches",
+    "platform": "Native macOS"
+  },
+  "constraints": [
+    "Keep current-note operations close to the note.",
+    "Do not add accounts, subscriptions, or assume notification authorization has been granted."
+  ],
+  "required_artifacts": [
+    "settings interaction specification"
+  ],
+  "checks": [
+    {
+      "id": "task-options-local",
+      "kind": "heuristic",
+      "criterion": "Places current-note sorting and export in the note context, with a reason tied to use during writing.",
+      "evidence": "document",
+      "required": true
+    },
+    {
+      "id": "defaults-explicit",
+      "kind": "hard",
+      "criterion": "Explicitly separates stored reminder time, the initially-off enabled state, and unknown OS authorization; unprovided time defaults are labeled proposals.",
+      "evidence": "document",
+      "required": true
+    },
+    {
+      "id": "system-respected",
+      "kind": "heuristic",
+      "criterion": "Uses system appearance as the stated default rather than duplicating global accessibility preferences.",
+      "evidence": "document",
+      "required": true
+    },
+    {
+      "id": "scope-kept",
+      "kind": "process",
+      "criterion": "Produces a specification without implementation or a mandatory wireframe approval round.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "settings-architecture"
+}

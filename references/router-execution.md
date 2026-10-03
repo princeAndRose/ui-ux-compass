@@ -1,49 +1,31 @@
-# Router Execution
+# Router execution
 
-Use this guide when `ui-ux-compass-router` decides whether UI/UX Compass should intervene.
+Use the current request and relevant project evidence to select the next useful action. Impact, unresolved decisions, evidence quality, and reversibility are separate considerations.
 
-## Evidence Stack
+## Optional detector
 
-1. Model judgment: infer the user's intent, ambiguity, and user-facing impact from the current request and conversation.
-2. Deterministic detector result: when local shell access is available and the task is not obviously non-UI, run:
+The deterministic detector is a multilingual keyword/repository signal. Its risk and recommended mode are hypotheses, not final policy. It cannot know that an attached design is approved or that a prior answer resolved an uncertainty.
+
+Resolve the installed plugin root from the loaded skill (`../..`). Keep it separate from the target checkout:
 
 ```bash
-python3 scripts/detect_ui_surface.py --repo-root . --message "<user request>" --json
+python3 "/absolute/installed-plugin/scripts/detect_ui_surface.py" \
+  --repo-root "/absolute/target-project" --message "Add filters to the orders UI" --json
 ```
 
-Use `python` instead of `python3` when that is the available local Python command.
+Pass user text as a safely quoted argument or through a process API; do not interpolate untrusted text into shell syntax. Skip this command for obvious non-UI work and when the request is already clear.
 
-3. Repo evidence: inspect nearby routes, components, styling, design tokens, docs, screenshots, and tests before asking the user.
-4. Final routing decision: choose the lowest UI/UX risk level that protects the user-facing result.
+## Interpretation
 
-The deterministic detector is evidence, not the sole source of truth. Override it when repository context or the user's wording clearly proves a different risk level.
+- Backend/test context overrides incidental UI words.
+- Supplied, complete designs and established conventions can resolve a high-impact task without a new interview.
+- Subjective feedback warrants inspecting the current artifact before proposing a change.
+- A missing screenshot does not authorize an invented visual diagnosis.
+- A small change can require clarification when it changes the meaning or consequences of an action.
+- User requests to proceed permit reversible assumptions within scope; they do not confirm those assumptions.
 
-## When To Skip The Detector
+Keep reasoning concise: evidence used, material unknown (if any), next action. Consult [routing-matrix.md](routing-matrix.md) for examples.
 
-Skip the detector when the task is obviously outside user-facing UI:
+## Implementation and verification
 
-- Backend API behavior
-- Database schema or migrations
-- Pure unit tests or test harness work
-- Infrastructure, dependency, or CI configuration
-- Internal refactors with no user-facing behavior change
-- Documentation-only edits outside product UX copy
-
-## Conflict Rules
-
-- If the detector sees a UI word inside a backend/test task, prefer repo and user intent evidence. Example: "Refactor dashboard API tests" remains Risk 0.
-- If the detector returns non-UI but the changed files are routes, components, CSS, tokens, or UX copy, inspect the files and route as UI work.
-- If subjective feedback appears near a UI surface, route to `ui-ux-review`. Example: "This page feels weird" is Risk 4.
-- If a new page or flow has thin details, route to `ui-ux-capture-intent` or `ui-ux-brief` before implementation.
-- If the user asks to move fast, reduce questions but keep assumptions explicit.
-
-## Decision Record Shape
-
-When useful, write a compact routing note:
-
-```text
-Model judgment: existing dashboard UI, local filter behavior.
-Detector evidence: ui_related=true, risk_level=2, recommended_mode=ask-one-question.
-Repo evidence: app/dashboard/page.tsx and shared table component exist.
-Final routing decision: Risk 2, ask one question or proceed with stated assumptions.
-```
+Use existing components and the chosen design system unless the task changes them. Use only the references needed for the decision. Verification follows the original user outcome, not just generated documents. [design-quality-rubric.md](design-quality-rubric.md) defines evidence and applicability; [../evals/protocol.md](../evals/protocol.md) defines controlled comparisons.

@@ -1,0 +1,45 @@
+{
+  "id": "review-good-control",
+  "title": "Review a working notification preference",
+  "category": "review",
+  "design_system": "Existing semantic HTML; no imposed skin",
+  "source_urls": [],
+  "brief": "Review this complete notification-preference component for concrete defects. It is acceptable to find none. Do not rewrite it. State what cannot be verified from source alone.",
+  "context": "Complete source: <!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Email updates</title><style>body{font:1rem/1.5 system-ui;max-width:32rem;margin:2rem auto;padding:0 1rem;color:#18212b;background:#fff}button{font:inherit;padding:.5rem 1rem}button:focus-visible,input:focus-visible{outline:3px solid #005fcc;outline-offset:3px}label{display:block;padding:.5rem 0}</style><main><h1>Email updates</h1><form id=\"preferences\"><label><input id=\"weekly\" type=\"checkbox\"> Weekly product digest</label><button type=\"submit\">Save preference</button><p id=\"status\" role=\"status\"></p></form></main><script>const weekly=document.getElementById(\"weekly\"),status=document.getElementById(\"status\");document.getElementById(\"preferences\").addEventListener(\"submit\",e=>{e.preventDefault();status.textContent=weekly.checked?\"Weekly digest enabled for this session.\":\"Weekly digest disabled for this session.\";});</script></html>. Product contract: session-only prototype; weekly digest off initially; no server persistence, navigation, data loading or email sending required.",
+  "user_facts": {
+    "scope": "Review only",
+    "persistence": "Session-only is intentional"
+  },
+  "constraints": [
+    "Separate confirmed defects from unverified checks and optional preferences.",
+    "Do not treat lack of backend persistence as a defect."
+  ],
+  "required_artifacts": [
+    "evidence-based review"
+  ],
+  "checks": [
+    {
+      "id": "no-fabricated-failures",
+      "kind": "hard",
+      "criterion": "Does not assert missing label, absent feedback, absent focus CSS or required persistence as confirmed defects.",
+      "evidence": "document",
+      "required": true
+    },
+    {
+      "id": "evidence-boundary",
+      "kind": "process",
+      "criterion": "Distinguishes source inspection from rendered, keyboard and assistive-technology validation; claims execution only if supported by tool evidence.",
+      "evidence": "trace",
+      "required": true
+    },
+    {
+      "id": "restraint",
+      "kind": "process",
+      "criterion": "Does not produce unsolicited replacement code or require a visual redesign.",
+      "evidence": "trace",
+      "required": true
+    }
+  ],
+  "split": "development",
+  "family": "review-calibration"
+}

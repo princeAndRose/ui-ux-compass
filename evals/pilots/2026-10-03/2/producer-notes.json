@@ -1,0 +1,16 @@
+{
+  "task": "review-good-control",
+  "method": "Source-only review of the supplied complete HTML and product contract. No rendered browser or assistive-technology tests were performed.",
+  "resources_used": [
+    "<run>/task.json",
+    "<plugin>/skills/ui-ux-review/SKILL.md",
+    "<plugin>/references/design-quality-rubric.md",
+    "<plugin>/references/design-systems.md",
+    "<plugin>/references/review-checklist.md"
+  ],
+  "questions": [],
+  "artifacts": [
+    "output.md"
+  ],
+  "source_changes": false
+}

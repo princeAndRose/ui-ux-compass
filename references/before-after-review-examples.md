@@ -1,5 +1,7 @@
 # Before/After Review Examples
 
+These are contextual examples and diagnostic hypotheses, not universal rules. Apply the selected platform, design system and task constraints first; verify an actual consequence before treating a visual choice as a defect. See [design-systems.md](design-systems.md) and [design-quality-rubric.md](design-quality-rubric.md).
+
 Use these examples to make review feedback concrete and patchable.
 
 ## Dashboard

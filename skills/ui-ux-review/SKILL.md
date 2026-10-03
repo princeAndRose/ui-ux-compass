@@ -1,63 +1,18 @@
 ---
 name: ui-ux-review
-description: Use when reviewing an existing UI, screenshot, prototype, generated frontend, or when the user says the UI feels ugly, cramped, generic, template-like, off, too busy, too empty, not premium, not product-like, or hard to use.
+description: Diagnose an existing interface or subjective UI complaint using visible and behavioral evidence, and propose targeted improvements.
 ---
 
 # UI/UX Review
 
-Diagnose existing UI and convert subjective feedback into executable changes.
+Establish the task, platform, selected design system, and review scope. Inspect the supplied or running interface before making visual claims. Code supports structural observations, not proof of appearance or successful interaction.
 
-Use this when the user is dissatisfied with a UI, after implementation self-review, or when a screenshot/prototype needs critique.
+For each finding provide the observed problem, concrete evidence (screenshot region, tested interaction, or file), user impact/severity, focused fix, and a check demonstrating the fix.
 
-## Diagnostic Dimensions
+Separate hard failures, contextual heuristics, and style fit using [references/design-quality-rubric.md](../../references/design-quality-rubric.md). Compare with the relevant profile in [references/design-systems.md](../../references/design-systems.md). A different aesthetic is not itself a defect.
 
-- Information hierarchy
-- Visual focus
-- Layout structure
-- Spacing rhythm
-- Typography hierarchy
-- Color strategy
-- Component consistency
-- State completeness
-- Product realism
-- Template feel
-- Responsive behavior
-- Accessibility
-- Interaction path
-- Over-decoration
+Allow no findings, ties, and `unverified` conclusions. Do not invent flaws to fill a report. Without rendered evidence, visual conclusions remain hypotheses; without interaction tests, behavior remains unverified. A code review can still identify code-backed defects.
 
-## Translation Rules
+[references/feedback-translation-table.md](../../references/feedback-translation-table.md) and [references/before-after-review-examples.md](../../references/before-after-review-examples.md) provide hypotheses/examples, not automatic diagnoses. Read [references/review-checklist.md](../../references/review-checklist.md) selectively.
 
-- "Ugly" may mean unclear focus, flat hierarchy, mixed visual variables, or weak rhythm.
-- "Too cramped" may mean insufficient section spacing, overloaded first viewport, or weak grouping.
-- "Not premium" may mean uncontrolled shadows, cheap decoration, inconsistent type, or color imbalance.
-- "Template-like" may mean equal-weight card layout, generic SaaS structure, or content not shaped around the core task.
-- "Not product-like" may mean missing loading, empty, error, selected, disabled, or real data states.
-
-## Output Contract
-
-```md
-# UI Review
-
-## Diagnosis
-1. Problem:
-   Evidence:
-   Impact:
-   Fix:
-
-2. Problem:
-   Evidence:
-   Impact:
-   Fix:
-
-## Priority patch list
-P0:
-P1:
-P2:
-
-## Revised implementation prompt
-
-## Acceptance checklist
-```
-
-Use `references/review-checklist.md`, `references/anti-patterns.md`, `references/visual-vocabulary.md`, `references/design-quality-rubric.md`, `references/feedback-translation-table.md`, `references/state-patterns.md`, and `references/before-after-review-examples.md`.
+In evaluation runs, keep judges independent of producers and follow [evals/protocol.md](../../evals/protocol.md). Producer claims are not verification.
